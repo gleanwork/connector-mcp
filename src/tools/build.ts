@@ -2,16 +2,56 @@ import { z } from 'zod';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+/**
+ * Convert either a flat {fields:[]} schema (from update_schema) or a full
+ * SchemaDefinition (from infer_schema with save:true) into the SchemaDefinition
+ * format required by the code generator.
+ */
+function toSchemaDefinition(raw: Record<string, unknown>): SchemaDefinition {
+  // Already a SchemaDefinition — has entities array
+  if (Array.isArray(raw['entities'])) {
+    return raw as unknown as SchemaDefinition;
+  }
+
+  // Flat format from update_schema: { fields: [{name, type, required}] }
+  const flatFields = (raw['fields'] as Array<{ name: string; type?: string; required?: boolean }>) ?? [];
+  return {
+    entities: [
+      {
+        name: 'Item',
+        is_array: true,
+        sample_count: 0,
+        description: null,
+        fields: flatFields.map((f) => ({
+          name: f.name,
+          field_type: (f.type as FieldType | undefined) ?? FieldType.STRING,
+          required: f.required ?? false,
+          description: null,
+          nested_fields: [],
+          example_value: undefined,
+          is_array_item: false,
+        })),
+      },
+    ],
+    source_type: SchemaSourceType.MANUAL,
+    raw_sample: null,
+    inferred_at: new Date().toISOString(),
+    version: '1.0',
+  };
+}
+
 import {
   generateConnectorFiles,
   type GeneratorOptions,
 } from '../core/code-generator.js';
-import type {
-  SchemaDefinition,
-  MappingState,
-  MappingDecision,
-  MappingStatus,
-  DatasourceConfigState,
+import {
+  FieldType,
+  SchemaSourceType,
+  type SchemaDefinition,
+  type MappingState,
+  type MappingDecision,
+  type MappingStatus,
+  type DatasourceConfigState,
 } from '../types/index.js';
 import { getProjectPath } from '../session.js';
 
@@ -55,7 +95,8 @@ export async function handleBuildConnector(
   let config: Partial<DatasourceConfigState>;
 
   try {
-    schema = JSON.parse(readFileSync(schemaFile, 'utf8')) as SchemaDefinition;
+    const rawSchema = JSON.parse(readFileSync(schemaFile, 'utf8')) as Record<string, unknown>;
+    schema = toSchemaDefinition(rawSchema);
     rawMappings = JSON.parse(readFileSync(mappingsFile, 'utf8')) as typeof rawMappings;
     config = existsSync(configFile)
       ? (JSON.parse(readFileSync(configFile, 'utf8')) as Partial<DatasourceConfigState>)

@@ -29,6 +29,15 @@ import {
   buildConnectorSchema,
   handleBuildConnector,
 } from './tools/build.js';
+import {
+  runConnectorSchema,
+  inspectExecutionSchema,
+  manageRecordingSchema,
+  handleRunConnector,
+  handleInspectExecution,
+  handleManageRecording,
+} from './tools/execution.js';
+import { WORKFLOW_GUIDE } from './resources/workflow.js';
 import { getProjectPath } from './session.js';
 
 export function createServer(): McpServer {
@@ -153,6 +162,60 @@ export function createServer(): McpServer {
       inputSchema: buildConnectorSchema,
     },
     (params) => handleBuildConnector(params, getProjectPath()),
+  );
+
+  server.registerTool(
+    'run_connector',
+    {
+      description:
+        'Start async execution of the Python connector. Returns an execution_id immediately. ' +
+        'Poll status with inspect_execution.',
+      inputSchema: runConnectorSchema,
+    },
+    (params) => handleRunConnector(params, getProjectPath()),
+  );
+
+  server.registerTool(
+    'inspect_execution',
+    {
+      description:
+        'Check execution status and retrieve records. Returns status, records fetched, ' +
+        'per-record validation results, and recent logs.',
+      inputSchema: inspectExecutionSchema,
+    },
+    (params) => handleInspectExecution(params, getProjectPath()),
+  );
+
+  server.registerTool(
+    'manage_recording',
+    {
+      description:
+        'Manage connector recordings. ' +
+        'action: "record" saves fetched data, "replay" runs from a saved file, ' +
+        '"list" shows available recordings, "delete" removes one.',
+      inputSchema: manageRecordingSchema,
+    },
+    (params) => handleManageRecording(params, getProjectPath()),
+  );
+
+  // ── Resources ─────────────────────────────────────────────────
+
+  server.registerResource(
+    'connector://workflow',
+    'connector://workflow',
+    {
+      description: 'Step-by-step guide for authoring a Glean connector with these MCP tools',
+      mimeType: 'text/markdown',
+    },
+    async () => ({
+      contents: [
+        {
+          uri: 'connector://workflow',
+          text: WORKFLOW_GUIDE,
+          mimeType: 'text/markdown',
+        },
+      ],
+    }),
   );
 
   return server;
