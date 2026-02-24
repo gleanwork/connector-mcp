@@ -9,7 +9,14 @@ import { extname } from 'node:path';
 
 export interface FieldAnalysis {
   name: string;
-  detectedType: 'string' | 'number' | 'boolean' | 'datetime' | 'object' | 'array' | 'null';
+  detectedType:
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'datetime'
+    | 'object'
+    | 'array'
+    | 'null';
   nullRate: number;
   cardinality: number;
   samples: unknown[];
@@ -23,7 +30,10 @@ export function analyzeFile(filePath: string): FieldAnalysis[] {
   let records: Record<string, unknown>[];
 
   if (ext === '.csv') {
-    records = parse(raw, { columns: true, skip_empty_lines: true }) as Record<string, unknown>[];
+    records = parse(raw, { columns: true, skip_empty_lines: true }) as Record<
+      string,
+      unknown
+    >[];
   } else if (ext === '.json') {
     const parsed = JSON.parse(raw) as unknown;
     records = Array.isArray(parsed)
@@ -46,16 +56,22 @@ export function analyzeFile(filePath: string): FieldAnalysis[] {
   return fields.map((field) => analyzeField(field, records));
 }
 
-function analyzeField(name: string, records: Record<string, unknown>[]): FieldAnalysis {
+function analyzeField(
+  name: string,
+  records: Record<string, unknown>[],
+): FieldAnalysis {
   const values = records.map((r) => r[name]);
-  const nonNull = values.filter((v) => v !== null && v !== undefined && v !== '');
+  const nonNull = values.filter(
+    (v) => v !== null && v !== undefined && v !== '',
+  );
   const samples = [...new Set(nonNull)].slice(0, 5);
   const cardinality = new Set(nonNull.map(String)).size;
 
   return {
     name,
     detectedType: detectType(nonNull[0]),
-    nullRate: values.length > 0 ? (values.length - nonNull.length) / values.length : 0,
+    nullRate:
+      values.length > 0 ? (values.length - nonNull.length) / values.length : 0,
     cardinality,
     samples,
     totalRecords: records.length,

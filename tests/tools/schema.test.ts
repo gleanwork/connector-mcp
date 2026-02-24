@@ -74,13 +74,13 @@ describe('analyze_field', () => {
       join(projectPath, '.glean/schema.json'),
       JSON.stringify({
         fields: [{ name: 'email', type: 'string', required: false }],
-        sampleData: [
-          { email: 'alice@test.com' },
-          { email: 'bob@test.com' },
-        ],
+        sampleData: [{ email: 'alice@test.com' }, { email: 'bob@test.com' }],
       }),
     );
-    const result = await handleAnalyzeField({ field_name: 'email' }, projectPath);
+    const result = await handleAnalyzeField(
+      { field_name: 'email' },
+      projectPath,
+    );
     expect(result.content[0].text).toContain('email');
   });
 
@@ -89,7 +89,10 @@ describe('analyze_field', () => {
       join(projectPath, '.glean/schema.json'),
       JSON.stringify({ fields: [] }),
     );
-    const result = await handleAnalyzeField({ field_name: 'nonexistent' }, projectPath);
+    const result = await handleAnalyzeField(
+      { field_name: 'nonexistent' },
+      projectPath,
+    );
     expect(result.content[0].text).toContain('not found');
   });
 });

@@ -20,7 +20,10 @@ describe('get_config', () => {
   it('returns config JSON when config exists', async () => {
     writeFileSync(
       join(projectPath, '.glean/config.json'),
-      JSON.stringify({ auth_type: 'bearer', endpoint: 'https://api.example.com' }),
+      JSON.stringify({
+        auth_type: 'bearer',
+        endpoint: 'https://api.example.com',
+      }),
     );
     const result = await handleGetConfig({}, projectPath);
     expect(result.content[0].text).toContain('bearer');
@@ -44,7 +47,10 @@ describe('set_config', () => {
   it('merges new keys with existing config', async () => {
     writeFileSync(
       join(projectPath, '.glean/config.json'),
-      JSON.stringify({ auth_type: 'bearer', endpoint: 'https://api.example.com' }),
+      JSON.stringify({
+        auth_type: 'bearer',
+        endpoint: 'https://api.example.com',
+      }),
     );
     await handleSetConfig({ config: { page_size: 100 } }, projectPath);
     const saved = JSON.parse(

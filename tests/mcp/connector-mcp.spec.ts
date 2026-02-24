@@ -66,11 +66,20 @@ test('MCP protocol conformance', async ({ mcp, mcpClient }, testInfo) => {
     mcp,
     {
       requiredTools: [
-        'create_connector', 'infer_schema', 'get_schema', 'update_schema', 'analyze_field',
-        'get_mappings', 'confirm_mappings', 'validate_mappings',
-        'get_config', 'set_config',
+        'create_connector',
+        'infer_schema',
+        'get_schema',
+        'update_schema',
+        'analyze_field',
+        'get_mappings',
+        'confirm_mappings',
+        'validate_mappings',
+        'get_config',
+        'set_config',
         'build_connector',
-        'run_connector', 'inspect_execution', 'manage_recording',
+        'run_connector',
+        'inspect_execution',
+        'manage_recording',
       ],
       validateSchemas: true,
       checkServerInfo: true,
@@ -118,7 +127,9 @@ test.describe('MCP Protocol Conformance', () => {
 
   test('lists the connector://workflow resource', async ({ mcpClient }) => {
     const result = await mcpClient.listResources();
-    expect(result.resources.some((r) => r.uri === 'connector://workflow')).toBe(true);
+    expect(result.resources.some((r) => r.uri === 'connector://workflow')).toBe(
+      true,
+    );
   });
 
   test('handles unknown tool gracefully', async ({ mcp }) => {
@@ -160,7 +171,9 @@ test.describe('Schema Tools', () => {
     expect(text).toContain('title');
   });
 
-  test('infer_schema returns an error message for unsupported file types', async ({ mcp }) => {
+  test('infer_schema returns an error message for unsupported file types', async ({
+    mcp,
+  }) => {
     const result = await mcp.callTool('infer_schema', {
       file_path: join(PROJECT_PATH, 'data.xml'),
     });
@@ -179,7 +192,9 @@ test.describe('Mapping Tools', () => {
     setupProject();
   });
 
-  test('get_mappings returns source schema and Glean entity model', async ({ mcp }) => {
+  test('get_mappings returns source schema and Glean entity model', async ({
+    mcp,
+  }) => {
     const result = await mcp.callTool('get_mappings', {});
     expect(result.isError).toBeFalsy();
     const text = result.content[0].text as string;
@@ -187,7 +202,9 @@ test.describe('Mapping Tools', () => {
     expect(text).toContain('title');
   });
 
-  test('validate_mappings reports valid when all required fields are mapped', async ({ mcp }) => {
+  test('validate_mappings reports valid when all required fields are mapped', async ({
+    mcp,
+  }) => {
     const result = await mcp.callTool('validate_mappings', {});
     expect(result.isError).toBeFalsy();
     const text = result.content[0].text as string;
@@ -196,7 +213,9 @@ test.describe('Mapping Tools', () => {
 
   test('confirm_mappings saves mapping decisions', async ({ mcp }) => {
     const result = await mcp.callTool('confirm_mappings', {
-      mappings: [{ source_field: 'title', glean_field: 'title', transform: null }],
+      mappings: [
+        { source_field: 'title', glean_field: 'title', transform: null },
+      ],
     });
     expect(result.isError).toBeFalsy();
     const text = result.content[0].text as string;
@@ -235,7 +254,9 @@ test.describe('Build Tool', () => {
     setupProject();
   });
 
-  test('build_connector returns Python preview in dry_run mode', async ({ mcp }) => {
+  test('build_connector returns Python preview in dry_run mode', async ({
+    mcp,
+  }) => {
     const result = await mcp.callTool('build_connector', { dry_run: true });
     expect(result.isError).toBeFalsy();
     const text = result.content[0].text as string;
@@ -248,13 +269,17 @@ test.describe('Build Tool', () => {
 
 test.describe('Execution Tools', () => {
   test('run_connector returns an execution_id immediately', async ({ mcp }) => {
-    const result = await mcp.callTool('run_connector', { connector_name: 'Connector' });
+    const result = await mcp.callTool('run_connector', {
+      connector_name: 'Connector',
+    });
     expect(result.isError).toBeFalsy();
     const text = result.content[0].text as string;
     expect(text).toContain('execution_id');
   });
 
-  test('inspect_execution returns not found for unknown id', async ({ mcp }) => {
+  test('inspect_execution returns not found for unknown id', async ({
+    mcp,
+  }) => {
     const result = await mcp.callTool('inspect_execution', {
       execution_id: 'does-not-exist',
     });
@@ -273,8 +298,12 @@ test.describe('Execution Tools', () => {
 // ── Workflow Resource ────────────────────────────────────────────
 
 test.describe('Workflow Resource', () => {
-  test('connector://workflow returns the authoring guide', async ({ mcpClient }) => {
-    const result = await mcpClient.readResource({ uri: 'connector://workflow' });
+  test('connector://workflow returns the authoring guide', async ({
+    mcpClient,
+  }) => {
+    const result = await mcpClient.readResource({
+      uri: 'connector://workflow',
+    });
     expect(result.contents).toBeTruthy();
     const text = result.contents[0].text as string;
     expect(text).toContain('Step 1');

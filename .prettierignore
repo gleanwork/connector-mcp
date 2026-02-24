@@ -1,8 +1,6 @@
-node_modules/
 dist/
+node_modules/
 coverage/
-*.js.map
-.glean/
 .mcp-test-results/
 test-results/
-test-server.mjs
+package-lock.json

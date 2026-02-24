@@ -33,9 +33,19 @@ function getTemplatePath(): string {
     // Alongside this package in the glean workspace
     resolve(
       new URL(import.meta.url).pathname,
-      '..', '..', '..', '..', '..', 'glean-connector-project',
+      '..',
+      '..',
+      '..',
+      '..',
+      '..',
+      'glean-connector-project',
     ),
-    resolve(process.env['HOME'] ?? '~', 'workspace', 'glean', 'glean-connector-project'),
+    resolve(
+      process.env['HOME'] ?? '~',
+      'workspace',
+      'glean',
+      'glean-connector-project',
+    ),
   ].filter((p): p is string => Boolean(p));
 
   for (const candidate of candidates) {
@@ -46,7 +56,8 @@ function getTemplatePath(): string {
 
   throw new Error(
     'Copier template not found. Set GLEAN_CONNECTOR_TEMPLATE_PATH or ensure ' +
-    'glean-connector-project is at: ' + candidates.join(' or '),
+      'glean-connector-project is at: ' +
+      candidates.join(' or '),
   );
 }
 
@@ -56,7 +67,10 @@ function getTemplatePath(): string {
  * @param name - Connector project name (used as the directory name)
  * @param parentDirectory - Parent directory where the project will be created
  */
-export async function runCopier(name: string, parentDirectory: string): Promise<CopierResult> {
+export async function runCopier(
+  name: string,
+  parentDirectory: string,
+): Promise<CopierResult> {
   const projectPath = join(parentDirectory, name);
 
   try {
@@ -70,12 +84,16 @@ export async function runCopier(name: string, parentDirectory: string): Promise<
       '--trust',
       '--force',
       '--defaults',
-      '--data', `project_name=${name}`,
+      '--data',
+      `project_name=${name}`,
       templatePath,
       projectPath,
     ];
 
-    logger.info({ projectPath, name, templatePath }, 'Running Copier to generate connector project');
+    logger.info(
+      { projectPath, name, templatePath },
+      'Running Copier to generate connector project',
+    );
 
     const { stdout, stderr } = await execFileAsync('uv', args, {
       timeout: 120_000,
@@ -93,7 +111,10 @@ export async function runCopier(name: string, parentDirectory: string): Promise<
     return { success: true, projectPath };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error({ projectPath, err: error }, 'Copier failed to generate project');
+    logger.error(
+      { projectPath, err: error },
+      'Copier failed to generate project',
+    );
     return { success: false, projectPath, error: errorMessage };
   }
 }

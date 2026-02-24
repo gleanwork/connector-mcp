@@ -14,7 +14,12 @@ function toSchemaDefinition(raw: Record<string, unknown>): SchemaDefinition {
   }
 
   // Flat format from update_schema: { fields: [{name, type, required}] }
-  const flatFields = (raw['fields'] as Array<{ name: string; type?: string; required?: boolean }>) ?? [];
+  const flatFields =
+    (raw['fields'] as Array<{
+      name: string;
+      type?: string;
+      required?: boolean;
+    }>) ?? [];
   return {
     entities: [
       {
@@ -84,26 +89,57 @@ export async function handleBuildConnector(
   const configFile = join(projectPath, '.glean', 'config.json');
 
   if (!existsSync(schemaFile)) {
-    return { content: [{ type: 'text' as const, text: 'Error: schema not found. Run infer_schema or update_schema first.' }] };
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: 'Error: schema not found. Run infer_schema or update_schema first.',
+        },
+      ],
+    };
   }
   if (!existsSync(mappingsFile)) {
-    return { content: [{ type: 'text' as const, text: 'Error: mappings not found. Run confirm_mappings first.' }] };
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: 'Error: mappings not found. Run confirm_mappings first.',
+        },
+      ],
+    };
   }
 
   let schema: SchemaDefinition;
-  let rawMappings: { mappings: Array<{ source_field: string; glean_field: string; transform?: string | null }> };
+  let rawMappings: {
+    mappings: Array<{
+      source_field: string;
+      glean_field: string;
+      transform?: string | null;
+    }>;
+  };
   let config: Partial<DatasourceConfigState>;
 
   try {
-    const rawSchema = JSON.parse(readFileSync(schemaFile, 'utf8')) as Record<string, unknown>;
+    const rawSchema = JSON.parse(readFileSync(schemaFile, 'utf8')) as Record<
+      string,
+      unknown
+    >;
     schema = toSchemaDefinition(rawSchema);
-    rawMappings = JSON.parse(readFileSync(mappingsFile, 'utf8')) as typeof rawMappings;
+    rawMappings = JSON.parse(
+      readFileSync(mappingsFile, 'utf8'),
+    ) as typeof rawMappings;
     config = existsSync(configFile)
-      ? (JSON.parse(readFileSync(configFile, 'utf8')) as Partial<DatasourceConfigState>)
+      ? (JSON.parse(
+          readFileSync(configFile, 'utf8'),
+        ) as Partial<DatasourceConfigState>)
       : {};
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    return { content: [{ type: 'text' as const, text: `Error reading project files: ${msg}` }] };
+    return {
+      content: [
+        { type: 'text' as const, text: `Error reading project files: ${msg}` },
+      ],
+    };
   }
 
   // Build MappingState from flat mappings file format
@@ -150,7 +186,12 @@ export async function handleBuildConnector(
   };
 
   try {
-    const generated = generateConnectorFiles(schema, mappingState, fullConfig, options);
+    const generated = generateConnectorFiles(
+      schema,
+      mappingState,
+      fullConfig,
+      options,
+    );
 
     if (params.dry_run) {
       return {
@@ -192,6 +233,10 @@ export async function handleBuildConnector(
     };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    return { content: [{ type: 'text' as const, text: `Error generating connector: ${msg}` }] };
+    return {
+      content: [
+        { type: 'text' as const, text: `Error generating connector: ${msg}` },
+      ],
+    };
   }
 }

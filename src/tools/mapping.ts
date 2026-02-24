@@ -3,7 +3,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { atomicWriteFileSync } from '../core/fs-utils.js';
-import { GLEAN_DOCUMENT_FIELDS, REQUIRED_GLEAN_FIELDS } from '../lib/glean-entity-model.js';
+import {
+  GLEAN_DOCUMENT_FIELDS,
+  REQUIRED_GLEAN_FIELDS,
+} from '../lib/glean-entity-model.js';
 import { getProjectPath } from '../session.js';
 
 // ── File path helpers ────────────────────────────────────────────
@@ -29,9 +32,9 @@ export async function handleGetMappings(
   _params: z.infer<typeof getMappingsSchema>,
   projectPath = getProjectPath(),
 ) {
-  const schema = readJson<{ fields: Array<{ name: string; type?: string; required?: boolean }> }>(
-    schemaPath(projectPath),
-  );
+  const schema = readJson<{
+    fields: Array<{ name: string; type?: string; required?: boolean }>;
+  }>(schemaPath(projectPath));
 
   if (!schema) {
     return {
@@ -44,19 +47,21 @@ export async function handleGetMappings(
     };
   }
 
-  const existingMappings = readJson<{ mappings: Array<{ source_field: string; glean_field: string }> }>(
-    mappingsPath(projectPath),
-  );
+  const existingMappings = readJson<{
+    mappings: Array<{ source_field: string; glean_field: string }>;
+  }>(mappingsPath(projectPath));
 
   const lines = [
     '## Your Source Fields',
     ...schema.fields.map(
-      (f) => `  ${f.name} (${f.type ?? 'unknown'})${f.required ? ' [required]' : ''}`,
+      (f) =>
+        `  ${f.name} (${f.type ?? 'unknown'})${f.required ? ' [required]' : ''}`,
     ),
     '',
     '## Glean Entity Model (Document)',
     ...GLEAN_DOCUMENT_FIELDS.map(
-      (f) => `  ${f.name} (${f.type})${f.required ? ' [required]' : ''} — ${f.description}`,
+      (f) =>
+        `  ${f.name} (${f.type})${f.required ? ' [required]' : ''} — ${f.description}`,
     ),
   ];
 
@@ -97,18 +102,26 @@ export async function handleConfirmMappings(
   params: z.infer<typeof confirmMappingsSchema>,
   projectPath = getProjectPath(),
 ) {
-  const existing = readJson<{ mappings: unknown[] }>(mappingsPath(projectPath)) ?? { mappings: [] };
+  const existing = readJson<{ mappings: unknown[] }>(
+    mappingsPath(projectPath),
+  ) ?? { mappings: [] };
 
   // Merge: replace any existing mapping for the same glean_field
   const existingMap = new Map(
-    (existing.mappings as Array<{ glean_field: string }>).map((m) => [m.glean_field, m]),
+    (existing.mappings as Array<{ glean_field: string }>).map((m) => [
+      m.glean_field,
+      m,
+    ]),
   );
   for (const m of params.mappings) {
     existingMap.set(m.glean_field, m);
   }
 
   const merged = { mappings: [...existingMap.values()] };
-  atomicWriteFileSync(mappingsPath(projectPath), JSON.stringify(merged, null, 2));
+  atomicWriteFileSync(
+    mappingsPath(projectPath),
+    JSON.stringify(merged, null, 2),
+  );
 
   return {
     content: [
@@ -146,8 +159,12 @@ export async function handleValidateMappings(
     };
   }
 
-  const mappedGleanFields = new Set(mappings.mappings.map((m) => m.glean_field));
-  const missing = REQUIRED_GLEAN_FIELDS.filter((f) => !mappedGleanFields.has(f));
+  const mappedGleanFields = new Set(
+    mappings.mappings.map((m) => m.glean_field),
+  );
+  const missing = REQUIRED_GLEAN_FIELDS.filter(
+    (f) => !mappedGleanFields.has(f),
+  );
 
   if (missing.length > 0) {
     return {
@@ -157,7 +174,9 @@ export async function handleValidateMappings(
           text: [
             `Validation failed — ${missing.length} required Glean field(s) not mapped:`,
             ...missing.map((f) => {
-              const gleanField = GLEAN_DOCUMENT_FIELDS.find((gf) => gf.name === f);
+              const gleanField = GLEAN_DOCUMENT_FIELDS.find(
+                (gf) => gf.name === f,
+              );
               return `  • ${f} — ${gleanField?.description ?? ''}`;
             }),
             '',

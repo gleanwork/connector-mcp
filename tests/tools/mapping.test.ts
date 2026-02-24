@@ -26,7 +26,7 @@ describe('get_mappings', () => {
     const result = await handleGetMappings({}, projectPath);
     const text = result.content[0].text;
     expect(text).toContain('record_title'); // source field
-    expect(text).toContain('title');         // Glean field
+    expect(text).toContain('title'); // Glean field
   });
 
   it('handles missing schema gracefully', async () => {
@@ -39,7 +39,9 @@ describe('get_mappings', () => {
 
 describe('confirm_mappings', () => {
   it('saves mappings to .glean/mappings.json', async () => {
-    const mappings = [{ source_field: 'record_title', glean_field: 'title', transform: null }];
+    const mappings = [
+      { source_field: 'record_title', glean_field: 'title', transform: null },
+    ];
     await handleConfirmMappings({ mappings }, projectPath);
     const saved = JSON.parse(
       readFileSync(join(projectPath, '.glean/mappings.json'), 'utf8'),

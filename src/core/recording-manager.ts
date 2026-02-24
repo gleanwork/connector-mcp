@@ -72,7 +72,10 @@ export class RecordingManager {
     mkdirSync(connectorDir, { recursive: true });
 
     const recordingId = randomUUID().slice(0, 8);
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[:.]/g, '-')
+      .slice(0, 19);
     const filename = `${timestamp}_${recordingId}.json`;
     const filePath = join(connectorDir, filename);
 
@@ -144,7 +147,9 @@ export class RecordingManager {
     }
 
     try {
-      const data = JSON.parse(readFileSync(recordingPath, 'utf-8')) as Recording;
+      const data = JSON.parse(
+        readFileSync(recordingPath, 'utf-8'),
+      ) as Recording;
       logger.info(
         {
           recordingId: data.metadata.recording_id,
@@ -175,7 +180,9 @@ export class RecordingManager {
 
       if (connectorName && dir !== connectorName) continue;
 
-      const files = readdirSync(connectorDir).filter((f) => f.endsWith('.json'));
+      const files = readdirSync(connectorDir).filter((f) =>
+        f.endsWith('.json'),
+      );
       for (const file of files) {
         const filePath = join(connectorDir, file);
         try {
@@ -192,14 +199,18 @@ export class RecordingManager {
             path: filePath,
           });
         } catch (e) {
-          logger.warn({ path: filePath, err: e }, 'Failed to read recording metadata');
+          logger.warn(
+            { path: filePath, err: e },
+            'Failed to read recording metadata',
+          );
         }
       }
     }
 
     // Sort newest first
     recordings.sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
     return recordings;
   }
@@ -216,7 +227,9 @@ export class RecordingManager {
         continue;
       }
 
-      const files = readdirSync(connectorDir).filter((f) => f.includes(`_${recordingId}.json`));
+      const files = readdirSync(connectorDir).filter((f) =>
+        f.includes(`_${recordingId}.json`),
+      );
 
       for (const file of files) {
         try {

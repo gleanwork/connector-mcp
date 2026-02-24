@@ -36,7 +36,9 @@ export class SchemaManager {
     if (!existsSync(storagePath)) return null;
 
     try {
-      const data = JSON.parse(readFileSync(storagePath, 'utf-8')) as SchemaDefinition;
+      const data = JSON.parse(
+        readFileSync(storagePath, 'utf-8'),
+      ) as SchemaDefinition;
       this.schema = data;
       logger.info({ entityCount: data.entities.length }, 'Loaded schema');
       return this.schema;
@@ -50,7 +52,10 @@ export class SchemaManager {
     const storagePath = this.getStoragePath();
     atomicWriteFileSync(storagePath, JSON.stringify(schema, null, 2));
     this.schema = schema;
-    logger.info({ path: storagePath, entityCount: schema.entities.length }, 'Saved schema');
+    logger.info(
+      { path: storagePath, entityCount: schema.entities.length },
+      'Saved schema',
+    );
   }
 
   inferFromJson(
@@ -67,7 +72,9 @@ export class SchemaManager {
     if (Array.isArray(jsonData)) {
       if (jsonData.length > 0 && isObject(jsonData[0])) {
         const name = entityName ?? 'Item';
-        const fields = this.inferFieldsFromObjects(jsonData as Record<string, unknown>[]);
+        const fields = this.inferFieldsFromObjects(
+          jsonData as Record<string, unknown>[],
+        );
         entities.push({
           name,
           fields,
@@ -108,7 +115,9 @@ export class SchemaManager {
     return schema;
   }
 
-  private inferFieldsFromObjects(objects: Record<string, unknown>[]): FieldDefinition[] {
+  private inferFieldsFromObjects(
+    objects: Record<string, unknown>[],
+  ): FieldDefinition[] {
     const allFields = new Map<string, FieldDefinition>();
     const fieldPresence = new Map<string, number>();
 
@@ -126,7 +135,9 @@ export class SchemaManager {
             if (existing.field_type === FieldType.NULL) {
               existing.field_type = newType;
             } else if (
-              [FieldType.INTEGER, FieldType.NUMBER].includes(existing.field_type) &&
+              [FieldType.INTEGER, FieldType.NUMBER].includes(
+                existing.field_type,
+              ) &&
               [FieldType.INTEGER, FieldType.NUMBER].includes(newType)
             ) {
               existing.field_type = FieldType.NUMBER;
@@ -144,8 +155,12 @@ export class SchemaManager {
     return [...allFields.values()];
   }
 
-  private inferFieldsFromObject(obj: Record<string, unknown>): FieldDefinition[] {
-    return Object.entries(obj).map(([key, value]) => this.createFieldDefinition(key, value));
+  private inferFieldsFromObject(
+    obj: Record<string, unknown>,
+  ): FieldDefinition[] {
+    return Object.entries(obj).map(([key, value]) =>
+      this.createFieldDefinition(key, value),
+    );
   }
 
   private createFieldDefinition(name: string, value: unknown): FieldDefinition {
@@ -153,10 +168,18 @@ export class SchemaManager {
     let nestedFields: FieldDefinition[] = [];
 
     if (fieldType === FieldType.OBJECT && isObject(value)) {
-      nestedFields = this.inferFieldsFromObject(value as Record<string, unknown>);
-    } else if (fieldType === FieldType.ARRAY && Array.isArray(value) && value.length > 0) {
+      nestedFields = this.inferFieldsFromObject(
+        value as Record<string, unknown>,
+      );
+    } else if (
+      fieldType === FieldType.ARRAY &&
+      Array.isArray(value) &&
+      value.length > 0
+    ) {
       if (isObject(value[0])) {
-        nestedFields = this.inferFieldsFromObjects(value as Record<string, unknown>[]);
+        nestedFields = this.inferFieldsFromObjects(
+          value as Record<string, unknown>[],
+        );
       }
     }
 
@@ -211,7 +234,10 @@ export class SchemaManager {
     return String(value).slice(0, 100);
   }
 
-  private extractNestedEntities(obj: Record<string, unknown>, prefix = ''): EntityType[] {
+  private extractNestedEntities(
+    obj: Record<string, unknown>,
+    prefix = '',
+  ): EntityType[] {
     const entities: EntityType[] = [];
 
     for (const [key, value] of Object.entries(obj)) {
@@ -219,7 +245,9 @@ export class SchemaManager {
 
       if (Array.isArray(value) && value.length > 0 && isObject(value[0])) {
         const entityName = this.toEntityName(key);
-        const fields = this.inferFieldsFromObjects(value as Record<string, unknown>[]);
+        const fields = this.inferFieldsFromObjects(
+          value as Record<string, unknown>[],
+        );
         entities.push({
           name: entityName,
           fields,
@@ -230,12 +258,20 @@ export class SchemaManager {
         for (const item of value) {
           if (isObject(item)) {
             entities.push(
-              ...this.extractNestedEntities(item as Record<string, unknown>, fullPath),
+              ...this.extractNestedEntities(
+                item as Record<string, unknown>,
+                fullPath,
+              ),
             );
           }
         }
       } else if (isObject(value)) {
-        entities.push(...this.extractNestedEntities(value as Record<string, unknown>, fullPath));
+        entities.push(
+          ...this.extractNestedEntities(
+            value as Record<string, unknown>,
+            fullPath,
+          ),
+        );
       }
     }
 
@@ -244,7 +280,9 @@ export class SchemaManager {
 
   private toEntityName(key: string): string {
     const words = key.split(/[_\-\s]|(?=[A-Z])/).filter((w) => w.length > 0);
-    let name = words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+    let name = words
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join('');
     if (name.endsWith('s') && name.length > 1) {
       name = name.slice(0, -1);
     }
@@ -258,13 +296,14 @@ export class SchemaManager {
 
     // OpenAPI 3.x: components.schemas
     let schemas =
-      ((spec['components'] as Record<string, unknown> | undefined)?.['schemas'] as
-        | Record<string, Record<string, unknown>>
-        | undefined) ?? {};
+      ((spec['components'] as Record<string, unknown> | undefined)?.[
+        'schemas'
+      ] as Record<string, Record<string, unknown>> | undefined) ?? {};
 
     // Swagger 2.x fallback: definitions
     if (Object.keys(schemas).length === 0) {
-      schemas = (spec['definitions'] as Record<string, Record<string, unknown>>) ?? {};
+      schemas =
+        (spec['definitions'] as Record<string, Record<string, unknown>>) ?? {};
     }
 
     for (const [name, schemaDef] of Object.entries(schemas)) {
@@ -295,15 +334,26 @@ export class SchemaManager {
     schemaDef: Record<string, unknown>,
     allSchemas: Record<string, Record<string, unknown>>,
   ): EntityType | null {
-    if ((schemaDef['type'] as string | undefined) !== 'object' && !('properties' in schemaDef)) {
+    if (
+      (schemaDef['type'] as string | undefined) !== 'object' &&
+      !('properties' in schemaDef)
+    ) {
       return null;
     }
 
-    const properties = (schemaDef['properties'] as Record<string, Record<string, unknown>>) ?? {};
+    const properties =
+      (schemaDef['properties'] as Record<string, Record<string, unknown>>) ??
+      {};
     const requiredFields = new Set((schemaDef['required'] as string[]) ?? []);
 
-    const fields: FieldDefinition[] = Object.entries(properties).map(([propName, propDef]) =>
-      this.parseOpenapiProperty(propName, propDef, allSchemas, requiredFields.has(propName)),
+    const fields: FieldDefinition[] = Object.entries(properties).map(
+      ([propName, propDef]) =>
+        this.parseOpenapiProperty(
+          propName,
+          propDef,
+          allSchemas,
+          requiredFields.has(propName),
+        ),
     );
 
     return {
@@ -341,14 +391,19 @@ export class SchemaManager {
 
     let nestedFields: FieldDefinition[] = [];
     if (propType === 'object') {
-      const nestedProps = (propDef['properties'] as Record<string, Record<string, unknown>>) ?? {};
+      const nestedProps =
+        (propDef['properties'] as Record<string, Record<string, unknown>>) ??
+        {};
       const nestedRequired = new Set((propDef['required'] as string[]) ?? []);
       nestedFields = Object.entries(nestedProps).map(([n, d]) =>
         this.parseOpenapiProperty(n, d, allSchemas, nestedRequired.has(n)),
       );
     } else if (propType === 'array') {
       const items = (propDef['items'] as Record<string, unknown>) ?? {};
-      if ((items['type'] as string | undefined) === 'object' || '$ref' in items) {
+      if (
+        (items['type'] as string | undefined) === 'object' ||
+        '$ref' in items
+      ) {
         const itemField = this.parseOpenapiProperty('item', items, allSchemas);
         if (itemField.nested_fields.length > 0) {
           nestedFields = [{ ...itemField, is_array_item: true }];
@@ -373,11 +428,18 @@ export class SchemaManager {
   ): FieldDefinition[] {
     if ((refSchema['type'] as string | undefined) !== 'object') return [];
 
-    const properties = (refSchema['properties'] as Record<string, Record<string, unknown>>) ?? {};
+    const properties =
+      (refSchema['properties'] as Record<string, Record<string, unknown>>) ??
+      {};
     const requiredFields = new Set((refSchema['required'] as string[]) ?? []);
 
     return Object.entries(properties).map(([propName, propDef]) =>
-      this.parseOpenapiProperty(propName, propDef, allSchemas, requiredFields.has(propName)),
+      this.parseOpenapiProperty(
+        propName,
+        propDef,
+        allSchemas,
+        requiredFields.has(propName),
+      ),
     );
   }
 
@@ -403,26 +465,35 @@ export class SchemaManager {
     return typeMap[openapiType] ?? FieldType.UNKNOWN;
   }
 
-  private extractEntitiesFromPaths(spec: Record<string, unknown>): EntityType[] {
+  private extractEntitiesFromPaths(
+    spec: Record<string, unknown>,
+  ): EntityType[] {
     const entities: EntityType[] = [];
-    const paths = (spec['paths'] as Record<string, Record<string, unknown>>) ?? {};
+    const paths =
+      (spec['paths'] as Record<string, Record<string, unknown>>) ?? {};
 
     for (const [path, methods] of Object.entries(paths)) {
       for (const [, details] of Object.entries(methods)) {
         if (!isObject(details)) continue;
         const det = details as Record<string, unknown>;
 
-        const responses = (det['responses'] as Record<string, Record<string, unknown>>) ?? {};
+        const responses =
+          (det['responses'] as Record<string, Record<string, unknown>>) ?? {};
         for (const [, response] of Object.entries(responses)) {
           if (!isObject(response)) continue;
           const resp = response as Record<string, unknown>;
-          const content = (resp['content'] as Record<string, Record<string, unknown>>) ?? {};
+          const content =
+            (resp['content'] as Record<string, Record<string, unknown>>) ?? {};
           for (const [, mediaDef] of Object.entries(content)) {
             const schema =
-              ((mediaDef as Record<string, unknown>)['schema'] as Record<string, unknown>) ?? {};
+              ((mediaDef as Record<string, unknown>)['schema'] as Record<
+                string,
+                unknown
+              >) ?? {};
             if ((schema['type'] as string | undefined) === 'object') {
               const entityName = this.pathToEntityName(path);
-              const properties = (schema['properties'] as Record<string, unknown>) ?? {};
+              const properties =
+                (schema['properties'] as Record<string, unknown>) ?? {};
               entities.push({
                 name: entityName,
                 fields: this.inferFieldsFromObject(properties),

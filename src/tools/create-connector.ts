@@ -10,7 +10,9 @@ import { atomicWriteFileSync } from '../core/fs-utils.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const createConnectorSchema = z.object({
-  name: z.string().describe('Name for the new connector (e.g. "salesforce-opportunities")'),
+  name: z
+    .string()
+    .describe('Name for the new connector (e.g. "salesforce-opportunities")'),
   parent_directory: z
     .string()
     .optional()
@@ -28,7 +30,10 @@ export async function handleCreateConnector(params: CreateConnectorParams) {
   if (!result.success) {
     return {
       content: [
-        { type: 'text' as const, text: `Error creating connector: ${result.error}` },
+        {
+          type: 'text' as const,
+          text: `Error creating connector: ${result.error}`,
+        },
       ],
     };
   }

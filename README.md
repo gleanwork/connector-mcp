@@ -69,13 +69,13 @@ Add to your Continue config or VS Code MCP settings:
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `GLEAN_INSTANCE` | Yes | Glean instance subdomain (e.g. `my-company`) |
-| `GLEAN_API_TOKEN` | Yes | Glean API token for index operations |
-| `GLEAN_PROJECT_PATH` | No | Default project directory; overridden by `create_connector` |
-| `GLEAN_CONNECTOR_TEMPLATE_PATH` | No | Path to a custom Copier template (defaults to `glean-connector-project` in workspace) |
-| `GLEAN_WORKER_COMMAND` | No | Command to start the Python worker (default: `uv run python -m glean_connector_worker`) |
+| Variable                        | Required | Description                                                                             |
+| ------------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| `GLEAN_INSTANCE`                | Yes      | Glean instance subdomain (e.g. `my-company`)                                            |
+| `GLEAN_API_TOKEN`               | Yes      | Glean API token for index operations                                                    |
+| `GLEAN_PROJECT_PATH`            | No       | Default project directory; overridden by `create_connector`                             |
+| `GLEAN_CONNECTOR_TEMPLATE_PATH` | No       | Path to a custom Copier template (defaults to `glean-connector-project` in workspace)   |
+| `GLEAN_WORKER_COMMAND`          | No       | Command to start the Python worker (default: `uv run python -m glean_connector_worker`) |
 
 ## Quick Start
 
@@ -100,22 +100,22 @@ The assistant will guide you through the full workflow using the MCP tools below
 
 ## Tool Reference
 
-| Tool | Description |
-|------|-------------|
-| `create_connector` | Scaffold a new connector project and set the active session path |
-| `infer_schema` | Parse a `.csv`, `.json`, or `.ndjson` file and return field analysis |
-| `get_schema` | Read current `.glean/schema.json` |
-| `update_schema` | Write field definitions to `.glean/schema.json` |
-| `analyze_field` | Deep-dive on a single field: samples, type, Glean mapping suggestions |
-| `get_mappings` | Show source schema and Glean entity model side-by-side |
-| `confirm_mappings` | Save field mapping decisions to `.glean/mappings.json` |
-| `validate_mappings` | Check mappings for missing required Glean fields |
-| `get_config` | Read `.glean/config.json` |
-| `set_config` | Write connector config (auth, endpoint, pagination) to `.glean/config.json` |
-| `build_connector` | Generate `connector.py`, `models.py`, `mock_data.json` from schema+mappings+config |
-| `run_connector` | Start async connector execution; returns `execution_id` immediately |
-| `inspect_execution` | Poll execution status; returns records, validation issues, logs |
-| `manage_recording` | Record/replay/list/delete connector data recordings |
+| Tool                | Description                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------- |
+| `create_connector`  | Scaffold a new connector project and set the active session path                   |
+| `infer_schema`      | Parse a `.csv`, `.json`, or `.ndjson` file and return field analysis               |
+| `get_schema`        | Read current `.glean/schema.json`                                                  |
+| `update_schema`     | Write field definitions to `.glean/schema.json`                                    |
+| `analyze_field`     | Deep-dive on a single field: samples, type, Glean mapping suggestions              |
+| `get_mappings`      | Show source schema and Glean entity model side-by-side                             |
+| `confirm_mappings`  | Save field mapping decisions to `.glean/mappings.json`                             |
+| `validate_mappings` | Check mappings for missing required Glean fields                                   |
+| `get_config`        | Read `.glean/config.json`                                                          |
+| `set_config`        | Write connector config (auth, endpoint, pagination) to `.glean/config.json`        |
+| `build_connector`   | Generate `connector.py`, `models.py`, `mock_data.json` from schema+mappings+config |
+| `run_connector`     | Start async connector execution; returns `execution_id` immediately                |
+| `inspect_execution` | Poll execution status; returns records, validation issues, logs                    |
+| `manage_recording`  | Record/replay/list/delete connector data recordings                                |
 
 ## Project Layout
 

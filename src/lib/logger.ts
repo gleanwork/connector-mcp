@@ -18,7 +18,12 @@ export interface Logger {
   child(ctx: Record<string, unknown>): Logger;
 }
 
-function log(level: string, name: string, ctx: Record<string, unknown>, msg: string): void {
+function log(
+  level: string,
+  name: string,
+  ctx: Record<string, unknown>,
+  msg: string,
+): void {
   const entry = { level, name, ...ctx, msg, time: new Date().toISOString() };
   process.stderr.write(JSON.stringify(entry) + '\n');
 }

@@ -130,7 +130,9 @@ export class WorkerPool {
     try {
       const [cmd, ...args] = getWorkerCommand();
       if (!cmd) {
-        return failure(new WorkerSpawnError(projectPath, 'Empty worker command'));
+        return failure(
+          new WorkerSpawnError(projectPath, 'Empty worker command'),
+        );
       }
 
       proc = spawn(cmd, args, {
@@ -234,7 +236,9 @@ export class WorkerPool {
       }
       this.handles.delete(workerId);
       this.connections.delete(workerId);
-      return failure(new WorkerDeadError(workerId, connection.process.exitCode));
+      return failure(
+        new WorkerDeadError(workerId, connection.process.exitCode),
+      );
     }
 
     connection.requestCounter += 1;
@@ -250,7 +254,9 @@ export class WorkerPool {
     return new Promise<Result<unknown, WorkerError>>((resolve) => {
       const timer = setTimeout(() => {
         connection.pendingRequests.delete(requestId);
-        resolve(failure(new WorkerTimeoutError(workerId, method, effectiveTimeout)));
+        resolve(
+          failure(new WorkerTimeoutError(workerId, method, effectiveTimeout)),
+        );
       }, effectiveTimeout * 1000);
 
       connection.pendingRequests.set(requestId, {
@@ -262,7 +268,9 @@ export class WorkerPool {
         reject: (error: Error) => {
           clearTimeout(timer);
           connection.pendingRequests.delete(requestId);
-          resolve(failure(new WorkerCommunicationError(workerId, error.message)));
+          resolve(
+            failure(new WorkerCommunicationError(workerId, error.message)),
+          );
         },
         timer,
       });
@@ -352,7 +360,9 @@ export class WorkerPool {
     if (connection && connection.process.exitCode !== null) {
       const dead = withState(handle, WorkerState.DEAD);
       this.handles.set(workerId, dead);
-      return failure(new WorkerDeadError(workerId, connection.process.exitCode));
+      return failure(
+        new WorkerDeadError(workerId, connection.process.exitCode),
+      );
     }
 
     return success(handle);
@@ -374,7 +384,10 @@ export class WorkerPool {
 
   findByProject(projectPath: string): WorkerHandle | null {
     for (const handle of this.handles.values()) {
-      if (handle.projectPath === projectPath && handle.state === WorkerState.RUNNING) {
+      if (
+        handle.projectPath === projectPath &&
+        handle.state === WorkerState.RUNNING
+      ) {
         const connection = this.connections.get(handle.workerId);
         if (connection && connection.process.exitCode === null) {
           return handle;
@@ -403,7 +416,9 @@ export class WorkerPool {
       if (pending) {
         if ('error' in message) {
           const errObj = message['error'] as Record<string, unknown>;
-          pending.reject(new Error((errObj['message'] as string) ?? 'JSON-RPC error'));
+          pending.reject(
+            new Error((errObj['message'] as string) ?? 'JSON-RPC error'),
+          );
         } else {
           pending.resolve(message['result']);
         }
@@ -435,7 +450,9 @@ export class WorkerPool {
     let level = 'info';
     let message = line;
 
-    for (const [prefix, logLevel] of Object.entries(WorkerPool.LOG_LEVEL_PREFIXES)) {
+    for (const [prefix, logLevel] of Object.entries(
+      WorkerPool.LOG_LEVEL_PREFIXES,
+    )) {
       if (line.startsWith(prefix)) {
         level = logLevel;
         message = line.slice(prefix.length).trim();

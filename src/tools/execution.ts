@@ -26,7 +26,9 @@ export const runConnectorSchema = z.object({
   recording_id: z
     .string()
     .optional()
-    .describe('If provided, replay from this recording instead of hitting the live source'),
+    .describe(
+      'If provided, replay from this recording instead of hitting the live source',
+    ),
 });
 
 export async function handleRunConnector(
@@ -34,7 +36,10 @@ export async function handleRunConnector(
   projectPath = getProjectPath(),
 ) {
   const executionId = randomUUID().slice(0, 8);
-  const state = createExecution(executionId, params.connector_name ?? 'Connector');
+  const state = createExecution(
+    executionId,
+    params.connector_name ?? 'Connector',
+  );
 
   // Spawn a Python worker asynchronously — don't await it here so we return immediately
   void (async () => {
@@ -47,7 +52,10 @@ export async function handleRunConnector(
         error: spawnResult.error.message,
         completedAt: new Date(),
       });
-      logger.warn({ executionId, err: spawnResult.error.message }, 'Worker spawn failed');
+      logger.warn(
+        { executionId, err: spawnResult.error.message },
+        'Worker spawn failed',
+      );
       return;
     }
 
@@ -65,7 +73,12 @@ export async function handleRunConnector(
             recordsFetched: current.recordsFetched + 1,
             records: [
               ...current.records,
-              { id: randomUUID(), raw: record, mapped: {}, validationIssues: [] },
+              {
+                id: randomUUID(),
+                raw: record,
+                mapped: {},
+                validationIssues: [],
+              },
             ],
           });
         }
@@ -75,7 +88,10 @@ export async function handleRunConnector(
           updateExecution(executionId, { logs: [...current.logs, p.message] });
         }
       } else if (msg['method'] === 'complete') {
-        updateExecution(executionId, { status: 'complete', completedAt: new Date() });
+        updateExecution(executionId, {
+          status: 'complete',
+          completedAt: new Date(),
+        });
       } else if (msg['method'] === 'error') {
         const p = msg['params'] as { message?: string } | undefined;
         updateExecution(executionId, {
@@ -122,9 +138,15 @@ export async function handleRunConnector(
 // ── inspect_execution ────────────────────────────────────────────
 
 export const inspectExecutionSchema = z.object({
-  execution_id: z.string().describe('The execution_id returned by run_connector'),
+  execution_id: z
+    .string()
+    .describe('The execution_id returned by run_connector'),
   offset: z.number().optional().default(0).describe('Record pagination offset'),
-  limit: z.number().optional().default(20).describe('Maximum records to return'),
+  limit: z
+    .number()
+    .optional()
+    .default(20)
+    .describe('Maximum records to return'),
 });
 
 export async function handleInspectExecution(
@@ -138,7 +160,11 @@ export async function handleInspectExecution(
       content: [
         {
           type: 'text' as const,
-          text: `Execution "${params.execution_id}" not found. Active executions: ${listExecutions().map((e) => e.id).join(', ') || 'none'}`,
+          text: `Execution "${params.execution_id}" not found. Active executions: ${
+            listExecutions()
+              .map((e) => e.id)
+              .join(', ') || 'none'
+          }`,
         },
       ],
     };
@@ -160,15 +186,22 @@ export async function handleInspectExecution(
     '',
     `## Records (${offset}–${offset + pageRecords.length} of ${state.records.length})`,
     pageRecords.length > 0
-      ? pageRecords.map((r) => `  [${r.id}] ${JSON.stringify(r.raw).slice(0, 120)}`).join('\n')
+      ? pageRecords
+          .map((r) => `  [${r.id}] ${JSON.stringify(r.raw).slice(0, 120)}`)
+          .join('\n')
       : '  (none yet)',
     '',
     Object.keys(validationSummary).length > 0
-      ? `## Validation Issues\n${Object.entries(validationSummary).map(([f, c]) => `  ${f}: ${c} issue(s)`).join('\n')}`
+      ? `## Validation Issues\n${Object.entries(validationSummary)
+          .map(([f, c]) => `  ${f}: ${c} issue(s)`)
+          .join('\n')}`
       : '## Validation: No issues',
     '',
     state.logs.length > 0
-      ? `## Recent Logs\n${state.logs.slice(-10).map((l) => `  ${l}`).join('\n')}`
+      ? `## Recent Logs\n${state.logs
+          .slice(-10)
+          .map((l) => `  ${l}`)
+          .join('\n')}`
       : null,
   ].filter((l): l is string => l !== null);
 
@@ -180,7 +213,9 @@ export async function handleInspectExecution(
 export const manageRecordingSchema = z.object({
   action: z
     .enum(['record', 'replay', 'list', 'delete'])
-    .describe('record: run and save output | replay: run from a saved file | list: show recordings | delete: remove a recording'),
+    .describe(
+      'record: run and save output | replay: run from a saved file | list: show recordings | delete: remove a recording',
+    ),
   connector_name: z
     .string()
     .optional()
@@ -206,7 +241,12 @@ export async function handleManageRecording(
       const recordings = manager.listRecordings(params.connector_name ?? null);
       if (recordings.length === 0) {
         return {
-          content: [{ type: 'text' as const, text: 'No recordings found in this project.' }],
+          content: [
+            {
+              type: 'text' as const,
+              text: 'No recordings found in this project.',
+            },
+          ],
         };
       }
       const lines = recordings.map(
@@ -214,7 +254,9 @@ export async function handleManageRecording(
           `  ${r.recording_id} | ${r.connector_name} | ${r.record_count} records | ${r.created_at}`,
       );
       return {
-        content: [{ type: 'text' as const, text: `Recordings:\n${lines.join('\n')}` }],
+        content: [
+          { type: 'text' as const, text: `Recordings:\n${lines.join('\n')}` },
+        ],
       };
     }
 
@@ -249,7 +291,12 @@ export async function handleManageRecording(
     case 'delete': {
       if (!params.recording_id) {
         return {
-          content: [{ type: 'text' as const, text: 'Error: recording_id is required for delete action.' }],
+          content: [
+            {
+              type: 'text' as const,
+              text: 'Error: recording_id is required for delete action.',
+            },
+          ],
         };
       }
       const deleted = manager.deleteRecording(params.recording_id);

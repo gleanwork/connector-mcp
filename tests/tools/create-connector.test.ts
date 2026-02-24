@@ -2,7 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { handleCreateConnector } from '../../src/tools/create-connector.js';
 
 vi.mock('../../src/core/copier-runner.js', () => ({
-  runCopier: vi.fn().mockResolvedValue({ success: true, projectPath: '/tmp/test-connector' }),
+  runCopier: vi
+    .fn()
+    .mockResolvedValue({ success: true, projectPath: '/tmp/test-connector' }),
 }));
 
 describe('create_connector', () => {
@@ -26,7 +28,10 @@ describe('create_connector', () => {
       projectPath: '/tmp/bad',
       error: 'Template not found',
     });
-    const result = await handleCreateConnector({ name: 'bad', parent_directory: '/tmp' });
+    const result = await handleCreateConnector({
+      name: 'bad',
+      parent_directory: '/tmp',
+    });
     expect(result.content[0].text).toContain('Error');
   });
 });

@@ -51,7 +51,9 @@ export function generateConnectorFiles(
 ): GeneratedFiles {
   const entity = findPrimaryEntity(schema);
   const confirmed = mappings.decisions.filter(
-    (d) => d.status === MappingStatus.CONFIRMED || d.status === MappingStatus.MODIFIED,
+    (d) =>
+      d.status === MappingStatus.CONFIRMED ||
+      d.status === MappingStatus.MODIFIED,
   );
 
   logger.info(
@@ -85,14 +87,19 @@ export function writeGeneratedFiles(
   writeFileSync(join(srcDir, 'connector.py'), files.connector);
   writeFileSync(join(srcDir, 'mock_data.json'), files.mockData);
 
-  logger.info({ outputDirectory, moduleName }, 'Wrote generated connector files');
+  logger.info(
+    { outputDirectory, moduleName },
+    'Wrote generated connector files',
+  );
 }
 
 // ── Schema → models.py ─────────────────────────────────────────
 
 function generateModels(entity: EntityType): string {
   const needsAny = entity.fields.some((f) =>
-    [FieldType.ARRAY, FieldType.OBJECT, FieldType.UNKNOWN].includes(f.field_type),
+    [FieldType.ARRAY, FieldType.OBJECT, FieldType.UNKNOWN].includes(
+      f.field_type,
+    ),
   );
 
   const typingImport = needsAny
@@ -173,7 +180,9 @@ function generateConnector(
 
   // ── Class ──
   lines.push(`class Connector(${baseClass}[SourceDocument]):`);
-  lines.push('    """Transforms source documents into Glean DocumentDefinitions."""');
+  lines.push(
+    '    """Transforms source documents into Glean DocumentDefinitions."""',
+  );
   lines.push('');
 
   // ── Configuration ──
@@ -181,7 +190,9 @@ function generateConnector(
   lines.push(`        name="${escPy(config.name)}",`);
   lines.push(`        display_name="${escPy(config.display_name)}",`);
   if (config.datasource_category) {
-    lines.push(`        datasource_category="${escPy(config.datasource_category)}",`);
+    lines.push(
+      `        datasource_category="${escPy(config.datasource_category)}",`,
+    );
   }
   if (config.url_regex) {
     lines.push(`        url_regex="${escPy(config.url_regex)}",`);
@@ -193,7 +204,9 @@ function generateConnector(
   lines.push(
     '    def transform(self, data: Sequence[SourceDocument]) -> Sequence[DocumentDefinition]:',
   );
-  lines.push('        """Convert source documents to Glean document definitions."""');
+  lines.push(
+    '        """Convert source documents to Glean document definitions."""',
+  );
   lines.push('        documents: list[DocumentDefinition] = []');
   lines.push('        for record in data:');
   lines.push('            doc = DocumentDefinition(');
@@ -223,7 +236,10 @@ function generateFieldValue(mapping: MappingDecision): string {
   return applyTransform(transform, sourceField);
 }
 
-function applyTransform(transform: FieldTransform, primarySourcePath: string): string {
+function applyTransform(
+  transform: FieldTransform,
+  primarySourcePath: string,
+): string {
   switch (transform.transform_type) {
     case TransformType.DEFAULT: {
       const defaultVal = toPythonLiteral(transform.default_value ?? null);
@@ -232,16 +248,21 @@ function applyTransform(transform: FieldTransform, primarySourcePath: string): s
 
     case TransformType.CONCAT: {
       const fields =
-        transform.source_paths.length > 0 ? transform.source_paths : [primarySourcePath];
+        transform.source_paths.length > 0
+          ? transform.source_paths
+          : [primarySourcePath];
       const parts = fields.map((f) => `str(record.get('${f}', ''))`).join(', ');
       return `' '.join([${parts}])`;
     }
 
     case TransformType.TEMPLATE: {
       const templateStr = transform.template ?? '';
-      const interpolated = templateStr.replace(/\{(\w+)\}/g, (_match, fieldName: string) => {
-        return `{record.get('${fieldName}', '')}`;
-      });
+      const interpolated = templateStr.replace(
+        /\{(\w+)\}/g,
+        (_match, fieldName: string) => {
+          return `{record.get('${fieldName}', '')}`;
+        },
+      );
       return `f"${interpolated}"`;
     }
 
@@ -252,7 +273,9 @@ function applyTransform(transform: FieldTransform, primarySourcePath: string): s
     }
 
     case TransformType.CUSTOM: {
-      return transform.custom_code ?? `record${pathToAccess(primarySourcePath)}`;
+      return (
+        transform.custom_code ?? `record${pathToAccess(primarySourcePath)}`
+      );
     }
 
     default:
@@ -307,7 +330,10 @@ function generateFieldAssignment(mapping: MappingDecision): string | null {
 
 // ── Schema → mock_data.json ─────────────────────────────────────
 
-function generateMockData(schema: SchemaDefinition, entity: EntityType): string {
+function generateMockData(
+  schema: SchemaDefinition,
+  entity: EntityType,
+): string {
   if (schema.raw_sample) {
     if (Array.isArray(schema.raw_sample)) {
       return JSON.stringify(schema.raw_sample, null, 2) + '\n';
@@ -317,7 +343,8 @@ function generateMockData(schema: SchemaDefinition, entity: EntityType): string 
 
   const sampleRecord: Record<string, unknown> = {};
   for (const field of entity.fields) {
-    sampleRecord[field.name] = field.example_value ?? getDefaultValue(field.field_type);
+    sampleRecord[field.name] =
+      field.example_value ?? getDefaultValue(field.field_type);
   }
 
   return JSON.stringify([sampleRecord], null, 2) + '\n';
@@ -326,11 +353,41 @@ function generateMockData(schema: SchemaDefinition, entity: EntityType): string 
 // ── Helpers ──────────────────────────────────────────────────────
 
 const PYTHON_RESERVED_WORDS = new Set([
-  'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await',
-  'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except',
-  'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is',
-  'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return',
-  'try', 'while', 'with', 'yield',
+  'False',
+  'None',
+  'True',
+  'and',
+  'as',
+  'assert',
+  'async',
+  'await',
+  'break',
+  'class',
+  'continue',
+  'def',
+  'del',
+  'elif',
+  'else',
+  'except',
+  'finally',
+  'for',
+  'from',
+  'global',
+  'if',
+  'import',
+  'in',
+  'is',
+  'lambda',
+  'nonlocal',
+  'not',
+  'or',
+  'pass',
+  'raise',
+  'return',
+  'try',
+  'while',
+  'with',
+  'yield',
 ]);
 
 function sanitizeFieldName(name: string): string {
@@ -360,17 +417,27 @@ function findPrimaryEntity(schema: SchemaDefinition): EntityType {
 
 function fieldTypeToPython(ft: FieldType): string {
   switch (ft) {
-    case FieldType.STRING: return 'str';
-    case FieldType.INTEGER: return 'int';
-    case FieldType.NUMBER: return 'float';
-    case FieldType.BOOLEAN: return 'bool';
+    case FieldType.STRING:
+      return 'str';
+    case FieldType.INTEGER:
+      return 'int';
+    case FieldType.NUMBER:
+      return 'float';
+    case FieldType.BOOLEAN:
+      return 'bool';
     case FieldType.DATE:
-    case FieldType.DATETIME: return 'str';
-    case FieldType.ARRAY: return 'list[Any]';
-    case FieldType.OBJECT: return 'dict[str, Any]';
-    case FieldType.NULL: return 'str | None';
-    case FieldType.UNKNOWN: return 'Any';
-    default: return 'Any';
+    case FieldType.DATETIME:
+      return 'str';
+    case FieldType.ARRAY:
+      return 'list[Any]';
+    case FieldType.OBJECT:
+      return 'dict[str, Any]';
+    case FieldType.NULL:
+      return 'str | None';
+    case FieldType.UNKNOWN:
+      return 'Any';
+    default:
+      return 'Any';
   }
 }
 
@@ -402,7 +469,10 @@ function toPythonLiteral(value: unknown): string {
   return JSON.stringify(value);
 }
 
-function getBaseClassInfo(datasourceType: string): { baseClass: string; importName: string } {
+function getBaseClassInfo(datasourceType: string): {
+  baseClass: string;
+  importName: string;
+} {
   switch (datasourceType) {
     case 'streaming':
       return {
@@ -424,14 +494,23 @@ function getBaseClassInfo(datasourceType: string): { baseClass: string; importNa
 
 function getDefaultValue(ft: FieldType): unknown {
   switch (ft) {
-    case FieldType.STRING: return 'example';
-    case FieldType.INTEGER: return 1;
-    case FieldType.NUMBER: return 1.0;
-    case FieldType.BOOLEAN: return true;
-    case FieldType.DATE: return '2024-01-15';
-    case FieldType.DATETIME: return '2024-01-15T09:00:00Z';
-    case FieldType.ARRAY: return [];
-    case FieldType.OBJECT: return {};
-    default: return null;
+    case FieldType.STRING:
+      return 'example';
+    case FieldType.INTEGER:
+      return 1;
+    case FieldType.NUMBER:
+      return 1.0;
+    case FieldType.BOOLEAN:
+      return true;
+    case FieldType.DATE:
+      return '2024-01-15';
+    case FieldType.DATETIME:
+      return '2024-01-15T09:00:00Z';
+    case FieldType.ARRAY:
+      return [];
+    case FieldType.OBJECT:
+      return {};
+    default:
+      return null;
   }
 }

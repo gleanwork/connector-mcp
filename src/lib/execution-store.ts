@@ -32,7 +32,10 @@ export interface ExecutionState {
 
 const executions = new Map<string, ExecutionState>();
 
-export function createExecution(id: string, connectorName: string): ExecutionState {
+export function createExecution(
+  id: string,
+  connectorName: string,
+): ExecutionState {
   const state: ExecutionState = {
     id,
     connectorName,
@@ -51,7 +54,10 @@ export function getExecution(id: string): ExecutionState | undefined {
   return executions.get(id);
 }
 
-export function updateExecution(id: string, update: Partial<Omit<ExecutionState, 'emitter'>>): void {
+export function updateExecution(
+  id: string,
+  update: Partial<Omit<ExecutionState, 'emitter'>>,
+): void {
   const state = executions.get(id);
   if (state) {
     executions.set(id, { ...state, ...update });
@@ -62,7 +68,9 @@ export function listExecutions(): ExecutionState[] {
   return [...executions.values()];
 }
 
-export function summarizeValidation(records: ExecutionRecord[]): Record<string, number> {
+export function summarizeValidation(
+  records: ExecutionRecord[],
+): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const r of records) {
     for (const issue of r.validationIssues) {

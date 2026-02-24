@@ -40,7 +40,10 @@ export class ValidationRulesManager {
 
   load(): ValidationRulesConfiguration {
     if (!existsSync(this.rulesFile)) {
-      logger.debug({ path: this.rulesFile }, 'No validation rules file, using defaults');
+      logger.debug(
+        { path: this.rulesFile },
+        'No validation rules file, using defaults',
+      );
       return this.getDefaultRules();
     }
 
@@ -48,7 +51,10 @@ export class ValidationRulesManager {
       const data = JSON.parse(
         readFileSync(this.rulesFile, 'utf-8'),
       ) as ValidationRulesConfiguration;
-      logger.info({ ruleCount: data.rules.length, path: this.rulesFile }, 'Loaded validation rules');
+      logger.info(
+        { ruleCount: data.rules.length, path: this.rulesFile },
+        'Loaded validation rules',
+      );
       return data;
     } catch (e) {
       logger.error(
@@ -61,6 +67,9 @@ export class ValidationRulesManager {
 
   save(config: ValidationRulesConfiguration): void {
     atomicWriteFileSync(this.rulesFile, JSON.stringify(config, null, 2));
-    logger.info({ ruleCount: config.rules.length, path: this.rulesFile }, 'Saved validation rules');
+    logger.info(
+      { ruleCount: config.rules.length, path: this.rulesFile },
+      'Saved validation rules',
+    );
   }
 }

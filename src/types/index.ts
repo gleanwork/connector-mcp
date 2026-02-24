@@ -105,7 +105,13 @@ export interface MappingState {
 
 // ── Datasource configuration types ──────────────────────────────
 
-export type PropertyType = 'TEXT' | 'DATE' | 'INT' | 'USERID' | 'PICKLIST' | 'TEXTLIST';
+export type PropertyType =
+  | 'TEXT'
+  | 'DATE'
+  | 'INT'
+  | 'USERID'
+  | 'PICKLIST'
+  | 'TEXTLIST';
 export type UiOption = 'NONE' | 'SEARCH_RESULT' | 'DOC_HOVERCARD';
 
 export interface PropertyDefinitionConfig {

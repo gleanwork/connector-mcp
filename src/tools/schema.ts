@@ -22,7 +22,9 @@ function readSchema(projectPath: string): Record<string, unknown> | null {
 // ── infer_schema ─────────────────────────────────────────────────
 
 export const inferSchemaSchema = z.object({
-  file_path: z.string().describe('Path to a .csv, .json, .ndjson, or .jsonl file to analyze'),
+  file_path: z
+    .string()
+    .describe('Path to a .csv, .json, .ndjson, or .jsonl file to analyze'),
   save: z
     .boolean()
     .optional()
@@ -39,8 +41,9 @@ export async function handleInferSchema(
 
     const lines = [
       `Analyzed ${analyses[0]?.totalRecords ?? 0} records, found ${analyses.length} fields:\n`,
-      ...analyses.map((f) =>
-        `  ${f.name}: ${f.detectedType} | null_rate=${(f.nullRate * 100).toFixed(1)}% | cardinality=${f.cardinality} | samples=${JSON.stringify(f.samples.slice(0, 3))}`,
+      ...analyses.map(
+        (f) =>
+          `  ${f.name}: ${f.detectedType} | null_rate=${(f.nullRate * 100).toFixed(1)}% | cardinality=${f.cardinality} | samples=${JSON.stringify(f.samples.slice(0, 3))}`,
       ),
       '',
       'Use update_schema to save a field definition, or set save:true to auto-save all fields.',
@@ -52,14 +55,21 @@ export async function handleInferSchema(
         type: f.detectedType,
         required: f.nullRate === 0,
       }));
-      atomicWriteFileSync(schemaPath(projectPath), JSON.stringify({ fields }, null, 2));
+      atomicWriteFileSync(
+        schemaPath(projectPath),
+        JSON.stringify({ fields }, null, 2),
+      );
       lines.push(`\nSchema saved to ${schemaPath(projectPath)}`);
     }
 
     return { content: [{ type: 'text' as const, text: lines.join('\n') }] };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    return { content: [{ type: 'text' as const, text: `Error analyzing file: ${msg}` }] };
+    return {
+      content: [
+        { type: 'text' as const, text: `Error analyzing file: ${msg}` },
+      ],
+    };
   }
 }
 
@@ -108,7 +118,10 @@ export async function handleUpdateSchema(
 ) {
   const existing = readSchema(projectPath) ?? {};
   const updated = { ...existing, fields: params.fields };
-  atomicWriteFileSync(schemaPath(projectPath), JSON.stringify(updated, null, 2));
+  atomicWriteFileSync(
+    schemaPath(projectPath),
+    JSON.stringify(updated, null, 2),
+  );
 
   return {
     content: [
@@ -133,11 +146,22 @@ export async function handleAnalyzeField(
   const schema = readSchema(projectPath);
   if (!schema) {
     return {
-      content: [{ type: 'text' as const, text: 'No schema found. Run infer_schema first.' }],
+      content: [
+        {
+          type: 'text' as const,
+          text: 'No schema found. Run infer_schema first.',
+        },
+      ],
     };
   }
 
-  const fields = (schema['fields'] as Array<{ name: string; type?: string; required?: boolean; description?: string }>) ?? [];
+  const fields =
+    (schema['fields'] as Array<{
+      name: string;
+      type?: string;
+      required?: boolean;
+      description?: string;
+    }>) ?? [];
   const field = fields.find((f) => f.name === params.field_name);
 
   if (!field) {
@@ -152,20 +176,24 @@ export async function handleAnalyzeField(
   }
 
   // Find Glean fields that could be a good match
-  const gleanSuggestions = GLEAN_DOCUMENT_FIELDS
-    .filter((gf) => {
-      const name = params.field_name.toLowerCase();
-      return (
-        name.includes(gf.name.toLowerCase()) ||
-        gf.name.toLowerCase().includes(name) ||
-        gf.type === field.type
-      );
-    })
-    .slice(0, 3);
+  const gleanSuggestions = GLEAN_DOCUMENT_FIELDS.filter((gf) => {
+    const name = params.field_name.toLowerCase();
+    return (
+      name.includes(gf.name.toLowerCase()) ||
+      gf.name.toLowerCase().includes(name) ||
+      gf.type === field.type
+    );
+  }).slice(0, 3);
 
   // Pull sample data if available
-  const sampleData = schema['sampleData'] as Array<Record<string, unknown>> | undefined;
-  const samples = sampleData?.map((r) => r[params.field_name]).filter(Boolean).slice(0, 5) ?? [];
+  const sampleData = schema['sampleData'] as
+    | Array<Record<string, unknown>>
+    | undefined;
+  const samples =
+    sampleData
+      ?.map((r) => r[params.field_name])
+      .filter(Boolean)
+      .slice(0, 5) ?? [];
 
   const lines = [
     `Field: ${field.name}`,

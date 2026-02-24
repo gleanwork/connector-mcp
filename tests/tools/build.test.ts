@@ -6,8 +6,15 @@ import { handleBuildConnector } from '../../src/tools/build.js';
 
 let projectPath: string;
 
-function setupProject(withSchema = true, withMappings = true, withConfig = true) {
-  projectPath = join(tmpdir(), `build-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+function setupProject(
+  withSchema = true,
+  withMappings = true,
+  withConfig = true,
+) {
+  projectPath = join(
+    tmpdir(),
+    `build-test-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  );
   mkdirSync(join(projectPath, '.glean'), { recursive: true });
 
   if (withSchema) {
@@ -20,8 +27,20 @@ function setupProject(withSchema = true, withMappings = true, withConfig = true)
             is_array: true,
             sample_count: 2,
             fields: [
-              { name: 'id', field_type: 'string', required: true, nested_fields: [], is_array_item: false },
-              { name: 'title', field_type: 'string', required: true, nested_fields: [], is_array_item: false },
+              {
+                name: 'id',
+                field_type: 'string',
+                required: true,
+                nested_fields: [],
+                is_array_item: false,
+              },
+              {
+                name: 'title',
+                field_type: 'string',
+                required: true,
+                nested_fields: [],
+                is_array_item: false,
+              },
             ],
           },
         ],
