@@ -23,14 +23,14 @@ export interface CopierResult {
 }
 
 /**
- * Resolve the path to the Glean connector project template.
- * Checks common locations relative to the workspace.
+ * Resolve the path or URL to the Glean connector project template.
+ * Checks local paths first; falls back to the published GitHub repo.
  */
 function getTemplatePath(): string {
-  const candidates = [
+  const localCandidates = [
     // Env override for CI / custom setups
     process.env['GLEAN_CONNECTOR_TEMPLATE_PATH'],
-    // Alongside this package in the glean workspace
+    // Alongside this package in the glean workspace (dev)
     resolve(
       new URL(import.meta.url).pathname,
       '..',
@@ -38,27 +38,30 @@ function getTemplatePath(): string {
       '..',
       '..',
       '..',
-      'glean-connector-project',
+      'copier-glean-connector',
     ),
     resolve(
       process.env['HOME'] ?? '~',
       'workspace',
       'glean',
-      'glean-connector-project',
+      'copier-glean-connector',
     ),
   ].filter((p): p is string => Boolean(p));
 
-  for (const candidate of candidates) {
+  for (const candidate of localCandidates) {
     if (existsSync(candidate)) {
       return candidate;
     }
   }
 
-  throw new Error(
-    'Copier template not found. Set GLEAN_CONNECTOR_TEMPLATE_PATH or ensure ' +
-      'glean-connector-project is at: ' +
-      candidates.join(' or '),
-  );
+  // Production fallback: use the published GitHub template directly
+  return 'git+ssh://git@github.com/gleanwork/copier-glean-connector.git';
+}
+
+export interface CopierData {
+  connector_category?: 'datasource' | 'people';
+  datasource_type?: 'basic' | 'streaming' | 'async_streaming';
+  description?: string;
 }
 
 /**
@@ -66,16 +69,29 @@ function getTemplatePath(): string {
  *
  * @param name - Connector project name (used as the directory name)
  * @param parentDirectory - Parent directory where the project will be created
+ * @param data - Additional template variables passed via --data flags
  */
 export async function runCopier(
   name: string,
   parentDirectory: string,
+  data: CopierData = {},
 ): Promise<CopierResult> {
   const projectPath = join(parentDirectory, name);
 
   try {
     const templatePath = getTemplatePath();
     mkdirSync(parentDirectory, { recursive: true });
+
+    const extraData: string[] = [];
+    if (data.connector_category) {
+      extraData.push('--data', `connector_category=${data.connector_category}`);
+    }
+    if (data.datasource_type) {
+      extraData.push('--data', `datasource_type=${data.datasource_type}`);
+    }
+    if (data.description) {
+      extraData.push('--data', `description=${data.description}`);
+    }
 
     const args = [
       'run',
@@ -86,6 +102,7 @@ export async function runCopier(
       '--defaults',
       '--data',
       `project_name=${name}`,
+      ...extraData,
       templatePath,
       projectPath,
     ];

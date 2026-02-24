@@ -2,6 +2,18 @@
   "name": "@gleanwork/connector-mcp",
   "version": "0.1.0",
   "description": "MCP server for AI-assisted Glean connector development",
+  "license": "MIT",
+  "author": "Steve Calvert <steve.calvert@glean.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gleanwork/glean-connector-mcp.git"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "glean",
+    "connector"
+  ],
   "type": "module",
   "bin": {
     "connector-mcp": "./bin/connector-mcp.js"
@@ -9,8 +21,19 @@
   "exports": {
     ".": "./dist/index.js"
   },
+  "files": [
+    "bin/**",
+    "dist/**",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build && chmod +x bin/connector-mcp.js",
     "dev": "tsx watch src/index.ts",
     "format": "prettier --write --ignore-unknown .",
     "format:check": "prettier --check --ignore-unknown .",

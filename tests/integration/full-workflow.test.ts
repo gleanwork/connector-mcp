@@ -113,12 +113,17 @@ describe('full connector workflow', () => {
     const { handleBuildConnector } = await import('../../src/tools/build.js');
     const preview = await handleBuildConnector({ dry_run: true }, projectPath);
     expect(preview.content[0].text).toContain('class');
-    expect(existsSync(join(projectPath, 'connector.py'))).toBe(false);
+    expect(existsSync(join(projectPath, 'src/connector/connector.py'))).toBe(
+      false,
+    );
 
     // ── Step 5c: Build for real ───────────────────────────────────
     await handleBuildConnector({ dry_run: false }, projectPath);
-    expect(existsSync(join(projectPath, 'connector.py'))).toBe(true);
-    expect(existsSync(join(projectPath, 'models.py'))).toBe(true);
+    // Files are written to src/{module_name}/ — matches Copier template structure
+    expect(existsSync(join(projectPath, 'src/connector/connector.py'))).toBe(
+      true,
+    );
+    expect(existsSync(join(projectPath, 'src/connector/models.py'))).toBe(true);
 
     // ── Step 6: Run and inspect ───────────────────────────────────
     const { handleRunConnector, handleInspectExecution } =

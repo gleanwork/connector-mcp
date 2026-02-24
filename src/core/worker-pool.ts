@@ -64,7 +64,7 @@ export class WorkerCommunicationError extends WorkerError {
 function getWorkerCommand(): string[] {
   const cmd = process.env['GLEAN_WORKER_COMMAND'];
   if (cmd) return cmd.split(' ');
-  return ['uv', 'run', 'python', '-m', 'glean_connector_worker'];
+  return ['uv', 'run', 'python', '-m', 'glean.indexing.worker'];
 }
 
 const REQUEST_TIMEOUT_SECONDS = parseInt(

@@ -261,11 +261,115 @@ export async function handleManageRecording(
     }
 
     case 'record': {
-      // Start a connector run that records its output
-      return handleRunConnector(
-        { connector_name: params.connector_name ?? 'Connector' },
-        projectPath,
-      );
+      const connectorName = params.connector_name ?? 'Connector';
+      const executionId = randomUUID().slice(0, 8);
+      const state = createExecution(executionId, connectorName);
+
+      // Start recording before spawning worker
+      manager.startRecording(connectorName);
+
+      void (async () => {
+        const pool = getWorkerPool();
+        const spawnResult = await pool.spawn(projectPath);
+
+        if (!spawnResult.ok) {
+          manager.cancelRecording();
+          updateExecution(executionId, {
+            status: 'failed',
+            error: spawnResult.error.message,
+            completedAt: new Date(),
+          });
+          return;
+        }
+
+        const { workerId } = spawnResult.value;
+
+        pool.addNotificationHandler(workerId, (msg) => {
+          const current = getExecution(executionId);
+          if (!current) return;
+
+          if (msg['method'] === 'record') {
+            const record = msg['params'] as Record<string, unknown> | undefined;
+            if (record) {
+              manager.addRecord(record);
+              updateExecution(executionId, {
+                recordsFetched: current.recordsFetched + 1,
+                records: [
+                  ...current.records,
+                  {
+                    id: randomUUID(),
+                    raw: record,
+                    mapped: {},
+                    validationIssues: [],
+                  },
+                ],
+              });
+            }
+          } else if (msg['method'] === 'log') {
+            const p = msg['params'] as { message?: string } | undefined;
+            if (p?.message) {
+              updateExecution(executionId, {
+                logs: [...current.logs, p.message],
+              });
+            }
+          } else if (msg['method'] === 'complete') {
+            const saved = manager.saveRecording();
+            updateExecution(executionId, {
+              status: 'complete',
+              completedAt: new Date(),
+            });
+            if (saved) {
+              logger.info(
+                {
+                  executionId,
+                  recordingId: saved.recording_id,
+                  recordCount: saved.record_count,
+                },
+                'Recording saved',
+              );
+            }
+          } else if (msg['method'] === 'error') {
+            manager.cancelRecording();
+            const p = msg['params'] as { message?: string } | undefined;
+            updateExecution(executionId, {
+              status: 'failed',
+              error: p?.message ?? 'Unknown error',
+              completedAt: new Date(),
+            });
+          }
+        });
+
+        const startResult = await pool.sendRequest(workerId, 'run', {
+          connector_name: connectorName,
+        });
+
+        if (!startResult.ok) {
+          manager.cancelRecording();
+          updateExecution(executionId, {
+            status: 'failed',
+            error: startResult.error.message,
+            completedAt: new Date(),
+          });
+        }
+      })();
+
+      state.emitter.emit('started');
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: [
+              `Recording started.`,
+              `execution_id: ${executionId}`,
+              `connector: ${connectorName}`,
+              ``,
+              `Records will be saved to .glean/recordings/${connectorName}/ on completion.`,
+              `Poll status with: inspect_execution { "execution_id": "${executionId}" }`,
+            ].join('\n'),
+          },
+        ],
+      };
     }
 
     case 'replay': {

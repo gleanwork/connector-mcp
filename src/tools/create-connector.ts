@@ -17,6 +17,22 @@ export const createConnectorSchema = z.object({
     .string()
     .optional()
     .describe('Directory to create the connector in. Defaults to cwd.'),
+  connector_category: z
+    .enum(['datasource', 'people'])
+    .optional()
+    .default('datasource')
+    .describe('Type of connector: datasource (default) or people'),
+  datasource_type: z
+    .enum(['basic', 'streaming', 'async_streaming'])
+    .optional()
+    .default('basic')
+    .describe(
+      'Connector base class type (only applies to datasource category)',
+    ),
+  description: z
+    .string()
+    .optional()
+    .describe('Short description of what this connector indexes'),
 });
 
 export type CreateConnectorParams = z.infer<typeof createConnectorSchema>;
@@ -25,7 +41,11 @@ export async function handleCreateConnector(params: CreateConnectorParams) {
   const parentDir = params.parent_directory ?? process.cwd();
   const projectPath = join(parentDir, params.name);
 
-  const result = await runCopier(params.name, parentDir);
+  const result = await runCopier(params.name, parentDir, {
+    connector_category: params.connector_category,
+    datasource_type: params.datasource_type,
+    description: params.description,
+  });
 
   if (!result.success) {
     return {

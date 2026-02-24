@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { atomicWriteFileSync } from '../core/fs-utils.js';
+import { readStoredSchema } from '../lib/schema-store.js';
 import {
   GLEAN_DOCUMENT_FIELDS,
   REQUIRED_GLEAN_FIELDS,
@@ -10,10 +11,6 @@ import {
 import { getProjectPath } from '../session.js';
 
 // ── File path helpers ────────────────────────────────────────────
-
-function schemaPath(projectPath: string): string {
-  return join(projectPath, '.glean', 'schema.json');
-}
 
 function mappingsPath(projectPath: string): string {
   return join(projectPath, '.glean', 'mappings.json');
@@ -32,9 +29,7 @@ export async function handleGetMappings(
   _params: z.infer<typeof getMappingsSchema>,
   projectPath = getProjectPath(),
 ) {
-  const schema = readJson<{
-    fields: Array<{ name: string; type?: string; required?: boolean }>;
-  }>(schemaPath(projectPath));
+  const schema = readStoredSchema(projectPath);
 
   if (!schema) {
     return {

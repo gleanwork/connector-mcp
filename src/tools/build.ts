@@ -1,63 +1,18 @@
 import { z } from 'zod';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-
-/**
- * Convert either a flat {fields:[]} schema (from update_schema) or a full
- * SchemaDefinition (from infer_schema with save:true) into the SchemaDefinition
- * format required by the code generator.
- */
-function toSchemaDefinition(raw: Record<string, unknown>): SchemaDefinition {
-  // Already a SchemaDefinition — has entities array
-  if (Array.isArray(raw['entities'])) {
-    return raw as unknown as SchemaDefinition;
-  }
-
-  // Flat format from update_schema: { fields: [{name, type, required}] }
-  const flatFields =
-    (raw['fields'] as Array<{
-      name: string;
-      type?: string;
-      required?: boolean;
-    }>) ?? [];
-  return {
-    entities: [
-      {
-        name: 'Item',
-        is_array: true,
-        sample_count: 0,
-        description: null,
-        fields: flatFields.map((f) => ({
-          name: f.name,
-          field_type: (f.type as FieldType | undefined) ?? FieldType.STRING,
-          required: f.required ?? false,
-          description: null,
-          nested_fields: [],
-          example_value: undefined,
-          is_array_item: false,
-        })),
-      },
-    ],
-    source_type: SchemaSourceType.MANUAL,
-    raw_sample: null,
-    inferred_at: new Date().toISOString(),
-    version: '1.0',
-  };
-}
 
 import {
   generateConnectorFiles,
   type GeneratorOptions,
 } from '../core/code-generator.js';
 import {
-  FieldType,
-  SchemaSourceType,
-  type SchemaDefinition,
   type MappingState,
   type MappingDecision,
   type MappingStatus,
   type DatasourceConfigState,
 } from '../types/index.js';
+import { readStoredSchema, toGeneratorInput } from '../lib/schema-store.js';
 import { getProjectPath } from '../session.js';
 
 export const buildConnectorSchema = z.object({
@@ -84,11 +39,11 @@ export async function handleBuildConnector(
   projectPath = getProjectPath(),
 ) {
   // Load required files
-  const schemaFile = join(projectPath, '.glean', 'schema.json');
   const mappingsFile = join(projectPath, '.glean', 'mappings.json');
   const configFile = join(projectPath, '.glean', 'config.json');
 
-  if (!existsSync(schemaFile)) {
+  const storedSchema = readStoredSchema(projectPath);
+  if (!storedSchema) {
     return {
       content: [
         {
@@ -109,7 +64,7 @@ export async function handleBuildConnector(
     };
   }
 
-  let schema: SchemaDefinition;
+  const schema = toGeneratorInput(storedSchema);
   let rawMappings: {
     mappings: Array<{
       source_field: string;
@@ -120,11 +75,6 @@ export async function handleBuildConnector(
   let config: Partial<DatasourceConfigState>;
 
   try {
-    const rawSchema = JSON.parse(readFileSync(schemaFile, 'utf8')) as Record<
-      string,
-      unknown
-    >;
-    schema = toSchemaDefinition(rawSchema);
     rawMappings = JSON.parse(
       readFileSync(mappingsFile, 'utf8'),
     ) as typeof rawMappings;
@@ -211,10 +161,12 @@ export async function handleBuildConnector(
       };
     }
 
-    // Write files
-    writeFileSync(join(projectPath, 'connector.py'), generated.connector);
-    writeFileSync(join(projectPath, 'models.py'), generated.models);
-    writeFileSync(join(projectPath, 'mock_data.json'), generated.mockData);
+    // Write files to src/{moduleName}/ — matches Copier template structure
+    const srcDir = join(projectPath, 'src', moduleName);
+    mkdirSync(srcDir, { recursive: true });
+    writeFileSync(join(srcDir, 'connector.py'), generated.connector);
+    writeFileSync(join(srcDir, 'models.py'), generated.models);
+    writeFileSync(join(srcDir, 'mock_data.json'), generated.mockData);
 
     return {
       content: [
@@ -222,9 +174,9 @@ export async function handleBuildConnector(
           type: 'text' as const,
           text: [
             'Generated files written:',
-            '  connector.py — connector class with transform() method',
-            '  models.py — SourceDocument TypedDict',
-            '  mock_data.json — sample data for local testing',
+            `  src/${moduleName}/connector.py — connector class with transform() method`,
+            `  src/${moduleName}/models.py — SourceDocument TypedDict`,
+            `  src/${moduleName}/mock_data.json — sample data for local testing`,
             '',
             'Next: run run_connector to test execution against your data source.',
           ].join('\n'),

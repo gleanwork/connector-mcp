@@ -21,32 +21,10 @@ function setupProject(
     writeFileSync(
       join(projectPath, '.glean/schema.json'),
       JSON.stringify({
-        entities: [
-          {
-            name: 'Item',
-            is_array: true,
-            sample_count: 2,
-            fields: [
-              {
-                name: 'id',
-                field_type: 'string',
-                required: true,
-                nested_fields: [],
-                is_array_item: false,
-              },
-              {
-                name: 'title',
-                field_type: 'string',
-                required: true,
-                nested_fields: [],
-                is_array_item: false,
-              },
-            ],
-          },
+        fields: [
+          { name: 'id', type: 'string', required: true },
+          { name: 'title', type: 'string', required: true },
         ],
-        source_type: 'json',
-        inferred_at: new Date().toISOString(),
-        version: '1.0',
       }),
     );
   }
@@ -89,8 +67,11 @@ describe('build_connector', () => {
 
   it('writes connector files when dry_run is false', async () => {
     await handleBuildConnector({ dry_run: false }, projectPath);
-    expect(existsSync(join(projectPath, 'connector.py'))).toBe(true);
-    expect(existsSync(join(projectPath, 'models.py'))).toBe(true);
+    // Files are written to src/{module_name}/ — matches Copier template structure
+    expect(existsSync(join(projectPath, 'src/connector/connector.py'))).toBe(
+      true,
+    );
+    expect(existsSync(join(projectPath, 'src/connector/models.py'))).toBe(true);
   });
 
   it('returns an error when schema is missing', async () => {
