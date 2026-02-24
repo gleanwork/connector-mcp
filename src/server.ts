@@ -1,6 +1,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-import { createConnectorSchema, handleCreateConnector } from './tools/create-connector.js';
+import {
+  createConnectorSchema,
+  handleCreateConnector,
+} from './tools/create-connector.js';
 import {
   inferSchemaSchema,
   getSchemaSchema,
@@ -25,10 +28,7 @@ import {
   handleGetConfig,
   handleSetConfig,
 } from './tools/config.js';
-import {
-  buildConnectorSchema,
-  handleBuildConnector,
-} from './tools/build.js';
+import { buildConnectorSchema, handleBuildConnector } from './tools/build.js';
 import {
   runConnectorSchema,
   inspectExecutionSchema,
@@ -42,7 +42,7 @@ import { getProjectPath } from './session.js';
 
 export function createServer(): McpServer {
   const server = new McpServer({
-    name: 'glean-connector',
+    name: 'glean-connector-mcp',
     version: '0.1.0',
   });
 
@@ -126,7 +126,7 @@ export function createServer(): McpServer {
     'validate_mappings',
     {
       description:
-        'Check current mappings against Glean\'s entity model. ' +
+        "Check current mappings against Glean's entity model. " +
         'Reports missing required fields and type mismatches.',
       inputSchema: validateMappingsSchema,
     },
@@ -136,7 +136,8 @@ export function createServer(): McpServer {
   server.registerTool(
     'get_config',
     {
-      description: 'Read the current connector configuration from .glean/config.json.',
+      description:
+        'Read the current connector configuration from .glean/config.json.',
       inputSchema: getConfigSchema,
     },
     (params) => handleGetConfig(params, getProjectPath()),
@@ -204,7 +205,8 @@ export function createServer(): McpServer {
     'connector://workflow',
     'connector://workflow',
     {
-      description: 'Step-by-step guide for authoring a Glean connector with these MCP tools',
+      description:
+        'Step-by-step guide for authoring a Glean connector with these MCP tools',
       mimeType: 'text/markdown',
     },
     async () => ({

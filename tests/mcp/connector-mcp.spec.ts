@@ -1,4 +1,5 @@
 import { test, expect } from '@gleanwork/mcp-server-tester/fixtures/mcp';
+import { runConformanceChecks } from '@gleanwork/mcp-server-tester';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -58,7 +59,29 @@ test.beforeAll(() => {
   setupProject();
 });
 
-// ── Protocol Conformance ─────────────────────────────────────────
+// ── Protocol Conformance (generates the reporter conformance widget) ──────
+
+test('MCP protocol conformance', async ({ mcp, mcpClient }, testInfo) => {
+  const result = await runConformanceChecks(
+    mcp,
+    {
+      requiredTools: [
+        'create_connector', 'infer_schema', 'get_schema', 'update_schema', 'analyze_field',
+        'get_mappings', 'confirm_mappings', 'validate_mappings',
+        'get_config', 'set_config',
+        'build_connector',
+        'run_connector', 'inspect_execution', 'manage_recording',
+      ],
+      validateSchemas: true,
+      checkServerInfo: true,
+      checkResources: true,
+    },
+    testInfo,
+  );
+  expect(result.pass).toBe(true);
+});
+
+// ── Individual Protocol Conformance Assertions ───────────────────
 
 test.describe('MCP Protocol Conformance', () => {
   test('returns valid server info', async ({ mcp }) => {
