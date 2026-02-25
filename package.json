@@ -45,7 +45,10 @@
     "test:mcp": "npm run build && playwright test",
     "test:mcp:ui": "npm run build && playwright test --ui",
     "test:mcp:integration": "playwright test tests/mcp/integration.spec.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs:generate": "tsx scripts/generate-configs.ts",
+    "docs:sync": "npm run docs:generate && markdown-code sync",
+    "docs:check": "npm run docs:generate && markdown-code check"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
@@ -55,17 +58,22 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.4",
     "@eslint/js": "^10.0.1",
+    "@gleanwork/mcp-config-schema": "^4.2.0",
     "@gleanwork/mcp-server-tester": "^0.12.0",
     "@playwright/test": "^1.58.2",
     "@release-it-plugins/lerna-changelog": "^8.0.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
     "eslint": "^10.0.2",
     "fixturify-project": "^7.1.3",
     "globals": "^17.3.0",
+    "js-yaml": "^4.1.1",
+    "markdown-code": "^0.6.1",
     "prettier": "^3.8.1",
     "release-it": "^19.0.4",
+    "smol-toml": "^1.6.0",
     "tsx": "^4.0.0",
     "typescript": "^5.6.0",
     "vitest": "^2.0.0"
