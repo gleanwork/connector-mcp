@@ -31,7 +31,7 @@ type ConnectorFixtures = {
  */
 export const test = base.extend<ConnectorFixtures>({
   // Per-test isolated project directory
-  connectorProject: async ({}, use) => {
+  connectorProject: async (_: object, use) => {
     const project = new Project('connector-test-project', '0.0.0', {
       files: {
         '.glean': {
