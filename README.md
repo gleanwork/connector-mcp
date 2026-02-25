@@ -1,5 +1,9 @@
 # @gleanwork/connector-mcp
 
+[![npm version](https://img.shields.io/npm/v/@gleanwork/connector-mcp.svg)](https://www.npmjs.com/package/@gleanwork/connector-mcp)
+[![CI](https://github.com/gleanwork/glean-connector-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/gleanwork/glean-connector-mcp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 An MCP server for AI-assisted Glean connector development. Add it to your IDE's MCP config and use Claude Code, Cursor, or any MCP-compatible AI assistant to scaffold, schema-map, generate, and test Glean connectors — without leaving your editor.
 
 ## Prerequisites
@@ -138,3 +142,39 @@ my-connector/
 ## MCP Resource
 
 The server exposes a `connector://workflow` resource that returns the full authoring guide. Your AI assistant can fetch it at session start for workflow context.
+
+## Troubleshooting
+
+### `spawn uv ENOENT`
+
+`uv` is not installed or is not on your `PATH`. The server requires `uv` to scaffold connector projects and to run the Python worker.
+
+Install it following the [official uv instructions](https://docs.astral.sh/uv/getting-started/installation/), then verify:
+
+```sh
+uv --version
+```
+
+If `uv` is installed but not on the PATH seen by your IDE, add it explicitly in the MCP server `env` config or set `GLEAN_WORKER_COMMAND` to the full path of an alternative command.
+
+### `Copier template not found`
+
+The server could not locate the `copier-glean-connector` template. By default it looks for the template alongside this package in the Glean workspace or clones it from `github.com/gleanwork` over SSH.
+
+Set the `GLEAN_CONNECTOR_TEMPLATE_PATH` environment variable to the absolute path of a local checkout of the template:
+
+```json
+{
+  "env": {
+    "GLEAN_CONNECTOR_TEMPLATE_PATH": "/path/to/copier-glean-connector"
+  }
+}
+```
+
+### `Worker exited` / `glean.indexing.worker` module not found
+
+The Python worker process exited immediately. This usually means one of:
+
+1. **You are not inside a Copier-scaffolded connector project.** The `run_connector` tool must be called after `create_connector` has set up the project directory with the correct `pyproject.toml` and dependencies.
+2. **The `glean-indexing-sdk` is not installed** in the project's virtual environment. Run `uv sync` inside the connector project directory to install dependencies.
+3. **Wrong working directory.** Ensure `GLEAN_PROJECT_PATH` points to the connector project root, or run `create_connector` first to set the active session path automatically.
