@@ -1,4 +1,4 @@
 {
   "snippetRoot": ".",
-  "markdownGlob": ["README.md", "docs/**/*.md"]
+  "markdownGlob": "**/*.md"
 }

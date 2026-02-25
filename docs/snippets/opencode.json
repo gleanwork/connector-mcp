@@ -1,0 +1,16 @@
+{
+  "mcp": {
+    "local": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
+      "environment": {
+        "GLEAN_INSTANCE": "your-instance",
+        "GLEAN_API_TOKEN": "glean_xxx"
+      }
+    }
+  }
+}

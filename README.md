@@ -18,14 +18,18 @@ An MCP server for AI-assisted Glean connector development. Add it to your IDE's 
 
 Add to `.claude/mcp.json` in your project (or `~/.claude/mcp.json` globally):
 
-```json
+```json snippet=docs/snippets/claude-code.json
 {
   "mcpServers": {
-    "glean-connector": {
+    "local": {
       "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
+      "args": [
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
+      "type": "stdio",
       "env": {
-        "GLEAN_INSTANCE": "my-company",
+        "GLEAN_INSTANCE": "your-instance",
         "GLEAN_API_TOKEN": "glean_xxx"
       }
     }
@@ -33,43 +37,7 @@ Add to `.claude/mcp.json` in your project (or `~/.claude/mcp.json` globally):
 }
 ```
 
-### Cursor
-
-Add to `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "glean-connector": {
-      "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
-      "env": {
-        "GLEAN_INSTANCE": "my-company",
-        "GLEAN_API_TOKEN": "glean_xxx"
-      }
-    }
-  }
-}
-```
-
-### VS Code (Continue / GitHub Copilot with MCP support)
-
-Add to your Continue config or VS Code MCP settings:
-
-```json
-{
-  "mcpServers": {
-    "glean-connector": {
-      "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
-      "env": {
-        "GLEAN_INSTANCE": "my-company",
-        "GLEAN_API_TOKEN": "glean_xxx"
-      }
-    }
-  }
-}
-```
+For setup instructions for Cursor, VS Code, Windsurf, Goose, Codex, JetBrains, Gemini CLI, OpenCode, and more, see [docs/setup.md](docs/setup.md).
 
 ## Environment Variables
 

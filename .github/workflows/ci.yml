@@ -80,3 +80,26 @@ jobs:
           name: mcp-test-results
           path: .mcp-test-results/
           retention-days: 7
+
+  docs:
+    name: Docs Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up mise
+        uses: jdx/mise-action@v2
+        with:
+          cache: true
+          mise_toml: |
+            [tools]
+            node = "22"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check docs are in sync
+        run: npm run docs:check
