@@ -104,7 +104,10 @@ test.describe('Schema Tools', () => {
     expect(text).toContain('2 field');
   });
 
-  test('infer_schema analyzes a CSV file', async ({ mcp, connectorProject }) => {
+  test('infer_schema analyzes a CSV file', async ({
+    mcp,
+    connectorProject,
+  }) => {
     const result = await mcp.callTool('infer_schema', {
       file_path: join(connectorProject.baseDir, 'sample.csv'),
     });

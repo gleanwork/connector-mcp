@@ -43,7 +43,10 @@ export function generateClientConfig(
   } else if (configFormat === 'toml') {
     // smol-toml requires Record<string, unknown>; buildConfiguration returns a
     // typed config object that is always a plain object at runtime.
-    return { content: toml.stringify(config as Record<string, unknown>), ext: 'toml' };
+    return {
+      content: toml.stringify(config as Record<string, unknown>),
+      ext: 'toml',
+    };
   } else {
     return { content: JSON.stringify(config, null, 2) + '\n', ext: 'json' };
   }
@@ -58,13 +61,19 @@ function main() {
   mkdirSync(outDir, { recursive: true });
 
   for (const clientId of IDE_CLIENTS) {
-    const { content, ext } = generateClientConfig(registry, clientId, PLACEHOLDER_ENV);
+    const { content, ext } = generateClientConfig(
+      registry,
+      clientId,
+      PLACEHOLDER_ENV,
+    );
     const outPath = join(outDir, `${clientId}.${ext}`);
     writeFileSync(outPath, content, 'utf-8');
     console.log(`  wrote ${outPath}`);
   }
 
-  console.log(`\nGenerated ${IDE_CLIENTS.length} config snippets to docs/snippets/`);
+  console.log(
+    `\nGenerated ${IDE_CLIENTS.length} config snippets to docs/snippets/`,
+  );
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

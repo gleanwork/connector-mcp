@@ -2,10 +2,7 @@
   "servers": {
     "local": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@gleanwork/connector-mcp"
-      ],
+      "args": ["-y", "@gleanwork/connector-mcp"],
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
