@@ -30,7 +30,7 @@ Add to `.claude/mcp.json` in your project (or `~/.claude/mcp.json` globally):
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "glean_xxx"
+        "GLEAN_API_TOKEN": "xxxxx"
       }
     }
   }

@@ -21,7 +21,7 @@ export const IDE_CLIENTS: ClientId[] = [
 
 export const PLACEHOLDER_ENV: Record<string, string> = {
   GLEAN_INSTANCE: 'your-instance',
-  GLEAN_API_TOKEN: 'glean_xxx',
+  GLEAN_API_TOKEN: 'xxxxx',
 };
 
 export function generateClientConfig(

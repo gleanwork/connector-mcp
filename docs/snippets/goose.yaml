@@ -13,4 +13,4 @@ extensions:
     env_keys: []
     envs:
       GLEAN_INSTANCE: your-instance
-      GLEAN_API_TOKEN: glean_xxx
+      GLEAN_API_TOKEN: xxxxx

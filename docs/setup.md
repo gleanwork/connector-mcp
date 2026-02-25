@@ -27,7 +27,7 @@ Add to `.claude/mcp.json` in your project, or `~/.claude/mcp.json` globally:
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "glean_xxx"
+        "GLEAN_API_TOKEN": "xxxxx"
       }
     }
   }
@@ -50,7 +50,7 @@ Add to `.cursor/mcp.json`:
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "glean_xxx"
+        "GLEAN_API_TOKEN": "xxxxx"
       }
     }
   }
@@ -73,7 +73,7 @@ Add to `.cursor/mcp.json` (same file as Cursor):
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "glean_xxx"
+        "GLEAN_API_TOKEN": "xxxxx"
       }
     }
   }
@@ -96,7 +96,7 @@ Add to `~/Library/Application Support/Code/User/mcp.json` (macOS) or `~/.config/
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "glean_xxx"
+        "GLEAN_API_TOKEN": "xxxxx"
       }
     }
   }
@@ -118,7 +118,7 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
       ],
       "env": {
         "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "glean_xxx"
+        "GLEAN_API_TOKEN": "xxxxx"
       }
     }
   }
@@ -145,7 +145,7 @@ extensions:
     env_keys: []
     envs:
       GLEAN_INSTANCE: your-instance
-      GLEAN_API_TOKEN: glean_xxx
+      GLEAN_API_TOKEN: xxxxx
 ```
 
 ## Codex
@@ -159,7 +159,7 @@ args = [ "-y", "@gleanwork/connector-mcp" ]
 
 [mcp_servers.local.env]
 GLEAN_INSTANCE = "your-instance"
-GLEAN_API_TOKEN = "glean_xxx"
+GLEAN_API_TOKEN = "xxxxx"
 ```
 
 ## Junie (JetBrains)
@@ -180,7 +180,7 @@ Add to `~/.junie/mcp/mcp.json`:
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "glean_xxx"
+        "GLEAN_API_TOKEN": "xxxxx"
       }
     }
   }
@@ -203,7 +203,7 @@ Add to `~/.junie/mcp/mcp.json`:
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "glean_xxx"
+        "GLEAN_API_TOKEN": "xxxxx"
       }
     }
   }
@@ -225,7 +225,7 @@ Add to `~/.gemini/settings.json`:
       ],
       "env": {
         "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "glean_xxx"
+        "GLEAN_API_TOKEN": "xxxxx"
       }
     }
   }
@@ -248,7 +248,7 @@ Add to `~/.config/opencode/opencode.json`:
       ],
       "environment": {
         "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "glean_xxx"
+        "GLEAN_API_TOKEN": "xxxxx"
       }
     }
   }

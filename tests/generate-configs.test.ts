@@ -33,7 +33,7 @@ describe('generateClientConfig', () => {
 
       it('contains GLEAN_API_TOKEN placeholder', () => {
         const { content } = generateClientConfig(registry, clientId, PLACEHOLDER_ENV);
-        expect(content).toContain('glean_xxx');
+        expect(content).toContain('xxxxx');
       });
     });
   }
