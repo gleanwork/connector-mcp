@@ -1,67 +1,10 @@
-import { test, expect } from '@gleanwork/mcp-server-tester/fixtures/mcp';
+import { test, expect } from './fixtures.js';
 import { runConformanceChecks } from '@gleanwork/mcp-server-tester';
-import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { tmpdir } from 'node:os';
-
-// Must match TEST_PROJECT_PATH in playwright.config.ts.
-// The MCP server process runs with cwd set to this directory, so
-// session.ts falls back to process.cwd() → this path.
-const PROJECT_PATH = join(tmpdir(), 'connector-mcp-playwright-tests');
-
-const setupProject = () => {
-  mkdirSync(join(PROJECT_PATH, '.glean'), { recursive: true });
-
-  writeFileSync(
-    join(PROJECT_PATH, '.glean/schema.json'),
-    JSON.stringify({
-      fields: [
-        { name: 'id', type: 'string', required: true },
-        { name: 'title', type: 'string', required: true },
-        { name: 'url', type: 'string', required: true },
-      ],
-    }),
-  );
-
-  writeFileSync(
-    join(PROJECT_PATH, '.glean/mappings.json'),
-    JSON.stringify({
-      mappings: [
-        { source_field: 'id', glean_field: 'datasourceObjectId' },
-        { source_field: 'title', glean_field: 'title' },
-        { source_field: 'url', glean_field: 'viewURL' },
-        { source_field: 'id', glean_field: 'permissions' },
-      ],
-    }),
-  );
-
-  writeFileSync(
-    join(PROJECT_PATH, '.glean/config.json'),
-    JSON.stringify({
-      name: 'test-datasource',
-      display_name: 'Test Datasource',
-      datasource_category: 'PUBLISHED_CONTENT',
-      connector_type: 'basic',
-      object_definitions: [],
-    }),
-  );
-
-  writeFileSync(
-    join(PROJECT_PATH, 'sample.csv'),
-    'id,title,url\n1,Hello World,https://example.com/1\n2,Foo Bar,https://example.com/2',
-  );
-};
-
-// Create project files before any test runs.
-// The MCP server is started fresh per test by the fixture, so files must
-// already exist on disk before the first tool call.
-test.beforeAll(() => {
-  setupProject();
-});
 
 // ── Protocol Conformance (generates the reporter conformance widget) ──────
 
-test('MCP protocol conformance', async ({ mcp, mcpClient }, testInfo) => {
+test('MCP protocol conformance', async ({ mcp }, testInfo) => {
   const result = await runConformanceChecks(
     mcp,
     {
@@ -95,7 +38,7 @@ test('MCP protocol conformance', async ({ mcp, mcpClient }, testInfo) => {
 test.describe('MCP Protocol Conformance', () => {
   test('returns valid server info', async ({ mcp }) => {
     const info = mcp.getServerInfo();
-    expect(info?.name).toBe('glean-connector');
+    expect(info?.name).toBe('glean-connector-mcp');
     expect(info?.version).toBeTruthy();
   });
 
@@ -161,9 +104,9 @@ test.describe('Schema Tools', () => {
     expect(text).toContain('2 field');
   });
 
-  test('infer_schema analyzes a CSV file', async ({ mcp }) => {
+  test('infer_schema analyzes a CSV file', async ({ mcp, connectorProject }) => {
     const result = await mcp.callTool('infer_schema', {
-      file_path: join(PROJECT_PATH, 'sample.csv'),
+      file_path: join(connectorProject.baseDir, 'sample.csv'),
     });
     expect(result.isError).toBeFalsy();
     const text = result.content[0].text as string;
@@ -173,9 +116,10 @@ test.describe('Schema Tools', () => {
 
   test('infer_schema returns an error message for unsupported file types', async ({
     mcp,
+    connectorProject,
   }) => {
     const result = await mcp.callTool('infer_schema', {
-      file_path: join(PROJECT_PATH, 'data.xml'),
+      file_path: join(connectorProject.baseDir, 'data.xml'),
     });
     // Tool-level error returned as text content, not a protocol-level error
     expect(result.isError).toBeFalsy();
@@ -187,11 +131,6 @@ test.describe('Schema Tools', () => {
 // ── Mapping Tools ────────────────────────────────────────────────
 
 test.describe('Mapping Tools', () => {
-  test.beforeEach(() => {
-    // Restore full project state in case a prior test mutated schema/mappings
-    setupProject();
-  });
-
   test('get_mappings returns source schema and Glean entity model', async ({
     mcp,
   }) => {
@@ -226,10 +165,6 @@ test.describe('Mapping Tools', () => {
 // ── Config Tools ─────────────────────────────────────────────────
 
 test.describe('Config Tools', () => {
-  test.beforeEach(() => {
-    setupProject();
-  });
-
   test('get_config returns the current config', async ({ mcp }) => {
     const result = await mcp.callTool('get_config', {});
     expect(result.isError).toBeFalsy();
@@ -250,10 +185,6 @@ test.describe('Config Tools', () => {
 // ── Build Tool ───────────────────────────────────────────────────
 
 test.describe('Build Tool', () => {
-  test.beforeEach(() => {
-    setupProject();
-  });
-
   test('build_connector returns Python preview in dry_run mode', async ({
     mcp,
   }) => {
