@@ -31,7 +31,8 @@ type ConnectorFixtures = {
  */
 export const test = base.extend<ConnectorFixtures>({
   // Per-test isolated project directory
-  connectorProject: async (_: object, use) => {
+  // eslint-disable-next-line no-empty-pattern
+  connectorProject: async ({}, use) => {
     const project = new Project('connector-test-project', '0.0.0', {
       files: {
         '.glean': {
