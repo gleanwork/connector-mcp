@@ -20,7 +20,10 @@ Add to `.claude/mcp.json` in your project, or `~/.claude/mcp.json` globally:
   "mcpServers": {
     "local": {
       "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
+      "args": [
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
@@ -40,7 +43,10 @@ Add to `.cursor/mcp.json`:
   "mcpServers": {
     "local": {
       "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
+      "args": [
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
@@ -60,7 +66,10 @@ Add to `.cursor/mcp.json` (same file as Cursor):
   "mcpServers": {
     "local": {
       "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
+      "args": [
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
@@ -80,7 +89,10 @@ Add to `~/Library/Application Support/Code/User/mcp.json` (macOS) or `~/.config/
   "servers": {
     "local": {
       "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
+      "args": [
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
@@ -100,7 +112,10 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
   "mcpServers": {
     "local": {
       "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
+      "args": [
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
       "env": {
         "GLEAN_INSTANCE": "your-instance",
         "GLEAN_API_TOKEN": "xxxxx"
@@ -158,7 +173,10 @@ Add to `~/.junie/mcp/mcp.json`:
   "mcpServers": {
     "local": {
       "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
+      "args": [
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
@@ -178,7 +196,10 @@ Add to `~/.junie/mcp/mcp.json`:
   "mcpServers": {
     "local": {
       "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
+      "args": [
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
@@ -198,7 +219,10 @@ Add to `~/.gemini/settings.json`:
   "mcpServers": {
     "local": {
       "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
+      "args": [
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
       "env": {
         "GLEAN_INSTANCE": "your-instance",
         "GLEAN_API_TOKEN": "xxxxx"
@@ -217,7 +241,11 @@ Add to `~/.config/opencode/opencode.json`:
   "mcp": {
     "local": {
       "type": "local",
-      "command": ["npx", "-y", "@gleanwork/connector-mcp"],
+      "command": [
+        "npx",
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
       "environment": {
         "GLEAN_INSTANCE": "your-instance",
         "GLEAN_API_TOKEN": "xxxxx"

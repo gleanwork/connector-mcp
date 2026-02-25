@@ -202,7 +202,9 @@ test.describe('Build Tool', () => {
 // ── Execution Tools ──────────────────────────────────────────────
 
 test.describe('Execution Tools', () => {
-  test.skip('run_connector returns an execution_id immediately', async ({ mcp }) => {
+  test.skip('run_connector returns an execution_id immediately', async ({
+    mcp,
+  }) => {
     // Requires uv to spawn the Python worker — skipped in environments without uv.
     const result = await mcp.callTool('run_connector', {
       connector_name: 'Connector',

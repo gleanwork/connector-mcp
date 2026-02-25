@@ -23,7 +23,10 @@ Add to `.claude/mcp.json` in your project (or `~/.claude/mcp.json` globally):
   "mcpServers": {
     "local": {
       "command": "npx",
-      "args": ["-y", "@gleanwork/connector-mcp"],
+      "args": [
+        "-y",
+        "@gleanwork/connector-mcp"
+      ],
       "type": "stdio",
       "env": {
         "GLEAN_INSTANCE": "your-instance",
