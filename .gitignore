@@ -6,3 +6,4 @@ coverage/
 .mcp-test-results/
 test-results/
 test-server.mjs
+docs/plans
