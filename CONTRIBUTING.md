@@ -4,12 +4,12 @@ Thank you for contributing. This document covers environment setup, the three te
 
 ## Prerequisites
 
-| Requirement | Version | Notes |
-|-------------|---------|-------|
-| Node.js | >= 18 | Use the version pinned in `.mise.toml` / `.nvmrc` if present |
-| [uv](https://docs.astral.sh/uv/) | latest | Required for Copier scaffolding and Python worker execution |
-| Python | >= 3.10 | Used by uv for connector execution and integration tests |
-| SSH access to `github.com/gleanwork` | — | Required for Copier to clone the connector template from `git+ssh://git@github.com/gleanwork/copier-glean-connector.git` |
+| Requirement                          | Version | Notes                                                                                                                    |
+| ------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Node.js                              | >= 18   | Use the version pinned in `.mise.toml` / `.nvmrc` if present                                                             |
+| [uv](https://docs.astral.sh/uv/)     | latest  | Required for Copier scaffolding and Python worker execution                                                              |
+| Python                               | >= 3.10 | Used by uv for connector execution and integration tests                                                                 |
+| SSH access to `github.com/gleanwork` | —       | Required for Copier to clone the connector template from `git+ssh://git@github.com/gleanwork/copier-glean-connector.git` |
 
 Install uv by following the [official instructions](https://docs.astral.sh/uv/getting-started/installation/). Verify with:
 
@@ -82,15 +82,15 @@ Tests live in `tests/integration/` and are marked with a `@slow` tag in their de
 
 ## Other Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `npm run build` | Compile TypeScript |
-| `npm run typecheck` | Type-check without emitting |
-| `npm run lint` | ESLint on `src/` and `tests/` |
-| `npm run lint:fix` | ESLint with auto-fix |
-| `npm run format` | Prettier formatting |
-| `npm run format:check` | Prettier check (used in CI) |
-| `npm run dev` | Watch mode via tsx |
+| Script                 | Purpose                       |
+| ---------------------- | ----------------------------- |
+| `npm run build`        | Compile TypeScript            |
+| `npm run typecheck`    | Type-check without emitting   |
+| `npm run lint`         | ESLint on `src/` and `tests/` |
+| `npm run lint:fix`     | ESLint with auto-fix          |
+| `npm run format`       | Prettier formatting           |
+| `npm run format:check` | Prettier check (used in CI)   |
+| `npm run dev`          | Watch mode via tsx            |
 
 ## Architecture Overview
 
