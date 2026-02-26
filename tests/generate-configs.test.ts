@@ -37,24 +37,6 @@ describe('generateClientConfig', () => {
           else if (ext === 'toml') toml.parse(content);
         }).not.toThrow();
       });
-
-      it('contains GLEAN_INSTANCE placeholder', () => {
-        const { content } = generateClientConfig(
-          registry,
-          clientId,
-          PLACEHOLDER_ENV,
-        );
-        expect(content).toContain('your-instance');
-      });
-
-      it('contains GLEAN_API_TOKEN placeholder', () => {
-        const { content } = generateClientConfig(
-          registry,
-          clientId,
-          PLACEHOLDER_ENV,
-        );
-        expect(content).toContain('xxxxx');
-      });
     });
   }
 });

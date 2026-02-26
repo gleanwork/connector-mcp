@@ -27,11 +27,7 @@ Add to `.claude/mcp.json` in your project (or `~/.claude/mcp.json` globally):
         "-y",
         "@gleanwork/connector-mcp"
       ],
-      "type": "stdio",
-      "env": {
-        "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "xxxxx"
-      }
+      "type": "stdio"
     }
   }
 }
