@@ -64,7 +64,8 @@ export async function handleInferSchema(
             formatNextSteps([
               {
                 label: 'Update Schema',
-                description: 'save the detected fields, adjusting types if needed',
+                description:
+                  'save the detected fields, adjusting types if needed',
                 tool: 'update_schema',
               },
               {

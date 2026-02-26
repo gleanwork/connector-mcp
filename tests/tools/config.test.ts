@@ -61,7 +61,7 @@ describe('set_config', () => {
   });
 });
 
-describe("set_config follow-up", () => {
+describe('set_config follow-up', () => {
   it("includes a What's next block", async () => {
     const result = await handleSetConfig(
       { config: { endpoint: 'https://api.example.com' } },

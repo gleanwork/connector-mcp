@@ -124,19 +124,21 @@ export async function handleRunConnector(
     content: [
       {
         type: 'text' as const,
-        text: [
-          `Connector execution started.`,
-          `execution_id: ${executionId}`,
-          `connector: ${params.connector_name ?? 'Connector'}`,
-          ``,
-          `Poll status with: inspect_execution { "execution_id": "${executionId}" }`,
-        ].join('\n') + formatNextSteps([
-          {
-            label: 'Inspect Execution',
-            description: 'check status and view ingested records',
-            tool: 'inspect_execution',
-          },
-        ]),
+        text:
+          [
+            `Connector execution started.`,
+            `execution_id: ${executionId}`,
+            `connector: ${params.connector_name ?? 'Connector'}`,
+            ``,
+            `Poll status with: inspect_execution { "execution_id": "${executionId}" }`,
+          ].join('\n') +
+          formatNextSteps([
+            {
+              label: 'Inspect Execution',
+              description: 'check status and view ingested records',
+              tool: 'inspect_execution',
+            },
+          ]),
       },
     ],
   };

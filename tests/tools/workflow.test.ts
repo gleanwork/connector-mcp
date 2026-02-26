@@ -4,8 +4,16 @@ import { formatNextSteps } from '../../src/tools/workflow.js';
 describe('formatNextSteps', () => {
   it('returns a block with the header and numbered items', () => {
     const result = formatNextSteps([
-      { label: 'Infer Schema', description: 'parse a data file', tool: 'infer_schema' },
-      { label: 'Set Config', description: 'define auth settings', tool: 'set_config' },
+      {
+        label: 'Infer Schema',
+        description: 'parse a data file',
+        tool: 'infer_schema',
+      },
+      {
+        label: 'Set Config',
+        description: 'define auth settings',
+        tool: 'set_config',
+      },
     ]);
     expect(result).toContain("**What's next?**");
     expect(result).toContain('1. **Infer Schema**');
@@ -23,7 +31,11 @@ describe('formatNextSteps', () => {
 
   it('works with a single step', () => {
     const result = formatNextSteps([
-      { label: 'Inspect', description: 'check status', tool: 'inspect_execution' },
+      {
+        label: 'Inspect',
+        description: 'check status',
+        tool: 'inspect_execution',
+      },
     ]);
     expect(result).toContain('1. **Inspect**');
     expect(result).not.toContain('2.');

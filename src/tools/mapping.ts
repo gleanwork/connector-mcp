@@ -192,8 +192,7 @@ export async function handleValidateMappings(
             formatNextSteps([
               {
                 label: 'Update Mappings',
-                description:
-                  'fix the missing required fields and re-confirm',
+                description: 'fix the missing required fields and re-confirm',
                 tool: 'confirm_mappings',
               },
             ]),
