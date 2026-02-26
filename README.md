@@ -37,13 +37,15 @@ For setup instructions for Cursor, VS Code, Windsurf, Goose, Codex, JetBrains, G
 
 ## Environment Variables
 
+These are set in the MCP server config, not in your connector project.
+
 | Variable                        | Required | Description                                                                             |
 | ------------------------------- | -------- | --------------------------------------------------------------------------------------- |
-| `GLEAN_INSTANCE`                | Yes      | Glean instance subdomain (e.g. `my-company`)                                            |
-| `GLEAN_API_TOKEN`               | Yes      | Glean API token for index operations                                                    |
 | `GLEAN_PROJECT_PATH`            | No       | Default project directory; overridden by `create_connector`                             |
 | `GLEAN_CONNECTOR_TEMPLATE_PATH` | No       | Path to a custom Copier template (defaults to `glean-connector-project` in workspace)   |
 | `GLEAN_WORKER_COMMAND`          | No       | Command to start the Python worker (default: `uv run python -m glean_connector_worker`) |
+
+`GLEAN_INSTANCE` and `GLEAN_API_TOKEN` belong in your connector project's `.env` file — `create_connector` generates a `.env.example` to get you started.
 
 ## Quick Start
 
@@ -51,35 +53,55 @@ In your AI assistant, try:
 
 > "I want to build a Glean connector for our Salesforce Opportunities data. The API uses OAuth2 bearer tokens and returns paginated JSON. Let's start."
 
-The assistant will guide you through the full workflow using the MCP tools below.
+Or call `get_started` — the assistant will ask what you're connecting and walk you through the rest.
 
-## Authoring Workflow
+## Core Workflow
 
-1. **`create_connector`** — scaffold the project, sets active directory
-2. **`set_config`** — save auth, endpoint, pagination config
-3. **`infer_schema`** — parse a sample data file and detect field types
-4. **`update_schema`** — define or adjust field definitions
-5. **`get_mappings`** — view source schema alongside Glean entity model
-6. **`confirm_mappings`** — save field mapping decisions
-7. **`validate_mappings`** — check all required Glean fields are covered
-8. **`build_connector`** — generate Python connector code (`dry_run: true` to preview)
-9. **`run_connector`** — start async execution, get `execution_id`
-10. **`inspect_execution`** — poll status, view records and validation results
+Eight steps from zero to a running connector. The assistant guides you through each one.
+
+| Step | What you're doing                            | Tool                                  |
+| ---- | -------------------------------------------- | ------------------------------------- |
+| 1    | Scaffold the project                         | `create_connector`                    |
+| 2    | Configure the data source                    | `set_config`                          |
+| 3    | Detect field types from a sample file        | `infer_schema`                        |
+| 4    | Define or refine field definitions           | `update_schema`                       |
+| 5    | Map source fields to Glean's entity model    | `confirm_mappings`                    |
+| 6    | Verify all required Glean fields are covered | `validate_mappings`                   |
+| 7    | Generate the Python connector code           | `build_connector`                     |
+| 8    | Run the connector and inspect results        | `run_connector` + `inspect_execution` |
 
 ## Tool Reference
 
+### Project Setup
+
+| Tool               | Description                                                                 |
+| ------------------ | --------------------------------------------------------------------------- |
+| `get_started`      | Open the guided workflow; the assistant asks what you're connecting         |
+| `create_connector` | Scaffold a new connector project and set the active session path            |
+| `set_config`       | Write connector config (auth, endpoint, pagination) to `.glean/config.json` |
+| `get_config`       | Read `.glean/config.json`                                                   |
+
+### Schema
+
+| Tool            | Description                                                           |
+| --------------- | --------------------------------------------------------------------- |
+| `infer_schema`  | Parse a `.csv`, `.json`, or `.ndjson` file and return field analysis  |
+| `get_schema`    | Read current `.glean/schema.json`                                     |
+| `update_schema` | Write field definitions to `.glean/schema.json`                       |
+| `analyze_field` | Deep-dive on a single field: samples, type, Glean mapping suggestions |
+
+### Field Mapping
+
+| Tool                | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| `get_mappings`      | Show source schema and Glean entity model side-by-side |
+| `confirm_mappings`  | Save field mapping decisions to `.glean/mappings.json` |
+| `validate_mappings` | Check mappings for missing required Glean fields       |
+
+### Build & Run
+
 | Tool                | Description                                                                        |
 | ------------------- | ---------------------------------------------------------------------------------- |
-| `create_connector`  | Scaffold a new connector project and set the active session path                   |
-| `infer_schema`      | Parse a `.csv`, `.json`, or `.ndjson` file and return field analysis               |
-| `get_schema`        | Read current `.glean/schema.json`                                                  |
-| `update_schema`     | Write field definitions to `.glean/schema.json`                                    |
-| `analyze_field`     | Deep-dive on a single field: samples, type, Glean mapping suggestions              |
-| `get_mappings`      | Show source schema and Glean entity model side-by-side                             |
-| `confirm_mappings`  | Save field mapping decisions to `.glean/mappings.json`                             |
-| `validate_mappings` | Check mappings for missing required Glean fields                                   |
-| `get_config`        | Read `.glean/config.json`                                                          |
-| `set_config`        | Write connector config (auth, endpoint, pagination) to `.glean/config.json`        |
 | `build_connector`   | Generate `connector.py`, `models.py`, `mock_data.json` from schema+mappings+config |
 | `run_connector`     | Start async connector execution; returns `execution_id` immediately                |
 | `inspect_execution` | Poll execution status; returns records, validation issues, logs                    |
