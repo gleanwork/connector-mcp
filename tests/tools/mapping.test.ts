@@ -48,6 +48,15 @@ describe('confirm_mappings', () => {
     ) as { mappings: { source_field: string }[] };
     expect(saved.mappings[0].source_field).toBe('record_title');
   });
+
+  it("includes a What's next block", async () => {
+    const mappings = [
+      { source_field: 'record_title', glean_field: 'title', transform: null },
+    ];
+    const result = await handleConfirmMappings({ mappings }, projectPath);
+    expect(result.content[0].text).toContain("What's next?");
+    expect(result.content[0].text).toContain('`validate_mappings`');
+  });
 });
 
 describe('validate_mappings', () => {
@@ -75,5 +84,31 @@ describe('validate_mappings', () => {
     );
     const result = await handleValidateMappings({}, projectPath);
     expect(result.content[0].text).toContain('valid');
+  });
+
+  it("includes build_connector in What's next when valid", async () => {
+    const mappings = [
+      { source_field: 'rec_id', glean_field: 'datasourceObjectId' },
+      { source_field: 'rec_title', glean_field: 'title' },
+      { source_field: 'rec_url', glean_field: 'viewURL' },
+      { source_field: 'rec_perms', glean_field: 'permissions' },
+    ];
+    writeFileSync(
+      join(projectPath, '.glean/mappings.json'),
+      JSON.stringify({ mappings }),
+    );
+    const result = await handleValidateMappings({}, projectPath);
+    expect(result.content[0].text).toContain("What's next?");
+    expect(result.content[0].text).toContain('`build_connector`');
+  });
+
+  it("includes confirm_mappings in What's next when invalid", async () => {
+    writeFileSync(
+      join(projectPath, '.glean/mappings.json'),
+      JSON.stringify({ mappings: [] }),
+    );
+    const result = await handleValidateMappings({}, projectPath);
+    expect(result.content[0].text).toContain("What's next?");
+    expect(result.content[0].text).toContain('`confirm_mappings`');
   });
 });

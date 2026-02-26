@@ -2,12 +2,7 @@
 
 Configure `@gleanwork/connector-mcp` in your AI coding assistant.
 
-All clients use the same environment variables:
-
-| Variable          | Required | Description                                    |
-| ----------------- | -------- | ---------------------------------------------- |
-| `GLEAN_INSTANCE`  | Yes      | Glean instance subdomain (e.g. `your-company`) |
-| `GLEAN_API_TOKEN` | Yes      | Glean API token for index operations           |
+The MCP server itself requires no Glean credentials. Credentials (`GLEAN_INSTANCE`, `GLEAN_API_TOKEN`) are set in your connector project's `.env` file — the `create_connector` tool generates a `.env.example` you can copy and fill in. They are only needed when you run the connector to ingest data.
 
 ---
 
@@ -24,11 +19,7 @@ Add to `.claude/mcp.json` in your project, or `~/.claude/mcp.json` globally:
         "-y",
         "@gleanwork/connector-mcp"
       ],
-      "type": "stdio",
-      "env": {
-        "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "xxxxx"
-      }
+      "type": "stdio"
     }
   }
 }
@@ -47,11 +38,7 @@ Add to `.cursor/mcp.json`:
         "-y",
         "@gleanwork/connector-mcp"
       ],
-      "type": "stdio",
-      "env": {
-        "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "xxxxx"
-      }
+      "type": "stdio"
     }
   }
 }
@@ -70,11 +57,7 @@ Add to `.cursor/mcp.json` (same file as Cursor):
         "-y",
         "@gleanwork/connector-mcp"
       ],
-      "type": "stdio",
-      "env": {
-        "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "xxxxx"
-      }
+      "type": "stdio"
     }
   }
 }
@@ -93,11 +76,7 @@ Add to `~/Library/Application Support/Code/User/mcp.json` (macOS) or `~/.config/
         "-y",
         "@gleanwork/connector-mcp"
       ],
-      "type": "stdio",
-      "env": {
-        "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "xxxxx"
-      }
+      "type": "stdio"
     }
   }
 }
@@ -115,11 +94,7 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
       "args": [
         "-y",
         "@gleanwork/connector-mcp"
-      ],
-      "env": {
-        "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "xxxxx"
-      }
+      ]
     }
   }
 }
@@ -143,9 +118,7 @@ extensions:
     bundled: null
     description: null
     env_keys: []
-    envs:
-      GLEAN_INSTANCE: your-instance
-      GLEAN_API_TOKEN: xxxxx
+    envs: {}
 ```
 
 ## Codex
@@ -156,10 +129,6 @@ Add to `~/.codex/config.toml`:
 [mcp_servers.local]
 command = "npx"
 args = [ "-y", "@gleanwork/connector-mcp" ]
-
-[mcp_servers.local.env]
-GLEAN_INSTANCE = "your-instance"
-GLEAN_API_TOKEN = "xxxxx"
 ```
 
 ## Junie (JetBrains)
@@ -177,11 +146,7 @@ Add to `~/.junie/mcp/mcp.json`:
         "-y",
         "@gleanwork/connector-mcp"
       ],
-      "type": "stdio",
-      "env": {
-        "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "xxxxx"
-      }
+      "type": "stdio"
     }
   }
 }
@@ -200,11 +165,7 @@ Add to `~/.junie/mcp/mcp.json`:
         "-y",
         "@gleanwork/connector-mcp"
       ],
-      "type": "stdio",
-      "env": {
-        "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "xxxxx"
-      }
+      "type": "stdio"
     }
   }
 }
@@ -222,11 +183,7 @@ Add to `~/.gemini/settings.json`:
       "args": [
         "-y",
         "@gleanwork/connector-mcp"
-      ],
-      "env": {
-        "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "xxxxx"
-      }
+      ]
     }
   }
 }
@@ -245,11 +202,7 @@ Add to `~/.config/opencode/opencode.json`:
         "npx",
         "-y",
         "@gleanwork/connector-mcp"
-      ],
-      "environment": {
-        "GLEAN_INSTANCE": "your-instance",
-        "GLEAN_API_TOKEN": "xxxxx"
-      }
+      ]
     }
   }
 }

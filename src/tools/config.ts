@@ -4,6 +4,7 @@ import { join } from 'node:path';
 
 import { atomicWriteFileSync } from '../core/fs-utils.js';
 import { getProjectPath } from '../session.js';
+import { formatNextSteps } from './workflow.js';
 
 function configPath(projectPath: string): string {
   return join(projectPath, '.glean', 'config.json');
@@ -65,6 +66,18 @@ export async function handleSetConfig(
         text: [
           `Config saved to .glean/config.json (${Object.keys(merged).length} key(s)):`,
           JSON.stringify(merged, null, 2),
+          formatNextSteps([
+            {
+              label: 'Infer Schema',
+              description: 'parse a sample data file to detect field types',
+              tool: 'infer_schema',
+            },
+            {
+              label: 'View Config',
+              description: 'review the config that was just saved',
+              tool: 'get_config',
+            },
+          ]),
         ].join('\n'),
       },
     ],

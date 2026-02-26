@@ -19,10 +19,9 @@ export const IDE_CLIENTS: ClientId[] = [
   'opencode',
 ];
 
-export const PLACEHOLDER_ENV: Record<string, string> = {
-  GLEAN_INSTANCE: 'your-instance',
-  GLEAN_API_TOKEN: 'xxxxx',
-};
+// No credentials here — GLEAN_INSTANCE and GLEAN_API_TOKEN belong in the
+// connector project's .env file, not in the MCP server config.
+export const PLACEHOLDER_ENV: Record<string, string> = {};
 
 export function generateClientConfig(
   registry: MCPConfigRegistry,

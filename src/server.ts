@@ -1,5 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
+import { getStartedSchema, handleGetStarted } from './tools/get-started.js';
 import {
   createConnectorSchema,
   handleCreateConnector,
@@ -45,6 +46,17 @@ export function createServer(): McpServer {
     name: 'glean-connector-mcp',
     version: '0.1.0',
   });
+
+  server.registerTool(
+    'get_started',
+    {
+      description:
+        'Start building a Glean connector. Returns an opening prompt that orients the AI ' +
+        'and asks the user what data source they want to connect. Call this first.',
+      inputSchema: getStartedSchema,
+    },
+    handleGetStarted,
+  );
 
   server.registerTool(
     'create_connector',

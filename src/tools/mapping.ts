@@ -9,6 +9,7 @@ import {
   REQUIRED_GLEAN_FIELDS,
 } from '../lib/glean-entity-model.js';
 import { getProjectPath } from '../session.js';
+import { formatNextSteps } from './workflow.js';
 
 // ── File path helpers ────────────────────────────────────────────
 
@@ -125,6 +126,18 @@ export async function handleConfirmMappings(
         text: [
           `Saved ${params.mappings.length} mapping(s). Total mappings: ${merged.mappings.length}.`,
           `Run validate_mappings to check for missing required Glean fields.`,
+          formatNextSteps([
+            {
+              label: 'Validate Mappings',
+              description: 'check for missing required Glean fields',
+              tool: 'validate_mappings',
+            },
+            {
+              label: 'Build Connector',
+              description: 'generate the Python connector code',
+              tool: 'build_connector',
+            },
+          ]),
         ].join('\n'),
       },
     ],
@@ -176,6 +189,13 @@ export async function handleValidateMappings(
             }),
             '',
             'Use confirm_mappings to add mappings for these fields.',
+            formatNextSteps([
+              {
+                label: 'Update Mappings',
+                description: 'fix the missing required fields and re-confirm',
+                tool: 'confirm_mappings',
+              },
+            ]),
           ].join('\n'),
         },
       ],
@@ -191,6 +211,13 @@ export async function handleValidateMappings(
           `  Mapped: ${[...mappedGleanFields].join(', ')}`,
           '',
           'Next step: run build_connector to generate the Python connector files.',
+          formatNextSteps([
+            {
+              label: 'Build Connector',
+              description: 'generate the Python connector code',
+              tool: 'build_connector',
+            },
+          ]),
         ].join('\n'),
       },
     ],

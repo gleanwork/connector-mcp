@@ -9,6 +9,7 @@ test('MCP protocol conformance', async ({ mcp }, testInfo) => {
     mcp,
     {
       requiredTools: [
+        'get_started',
         'create_connector',
         'infer_schema',
         'get_schema',
@@ -42,9 +43,9 @@ test.describe('MCP Protocol Conformance', () => {
     expect(info?.version).toBeTruthy();
   });
 
-  test('lists all 14 tools', async ({ mcp }) => {
+  test('lists all 15 tools', async ({ mcp }) => {
     const tools = await mcp.listTools();
-    expect(tools.length).toBe(14);
+    expect(tools.length).toBe(15);
   });
 
   test('tool names match expected set', async ({ mcp }) => {
@@ -58,6 +59,7 @@ test.describe('MCP Protocol Conformance', () => {
       'get_config',
       'get_mappings',
       'get_schema',
+      'get_started',
       'infer_schema',
       'inspect_execution',
       'manage_recording',

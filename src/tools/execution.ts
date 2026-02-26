@@ -12,6 +12,7 @@ import {
 } from '../lib/execution-store.js';
 import { getLogger } from '../lib/logger.js';
 import { getProjectPath } from '../session.js';
+import { formatNextSteps } from './workflow.js';
 
 const logger = getLogger('execution');
 
@@ -123,13 +124,21 @@ export async function handleRunConnector(
     content: [
       {
         type: 'text' as const,
-        text: [
-          `Connector execution started.`,
-          `execution_id: ${executionId}`,
-          `connector: ${params.connector_name ?? 'Connector'}`,
-          ``,
-          `Poll status with: inspect_execution { "execution_id": "${executionId}" }`,
-        ].join('\n'),
+        text:
+          [
+            `Connector execution started.`,
+            `execution_id: ${executionId}`,
+            `connector: ${params.connector_name ?? 'Connector'}`,
+            ``,
+            `Poll status with: inspect_execution { "execution_id": "${executionId}" }`,
+          ].join('\n') +
+          formatNextSteps([
+            {
+              label: 'Inspect Execution',
+              description: 'check status and view ingested records',
+              tool: 'inspect_execution',
+            },
+          ]),
       },
     ],
   };
@@ -175,6 +184,8 @@ export async function handleInspectExecution(
   const pageRecords = state.records.slice(offset, offset + limit);
   const validationSummary = summarizeValidation(state.records);
 
+  const failed = state.status === 'failed';
+
   const lines = [
     `## Execution ${state.id}`,
     `Status: ${state.status}`,
@@ -183,6 +194,11 @@ export async function handleInspectExecution(
     state.completedAt ? `Completed: ${state.completedAt.toISOString()}` : null,
     `Records fetched: ${state.recordsFetched}`,
     state.error ? `Error: ${state.error}` : null,
+    // On failure, surface all worker output immediately after the error so the
+    // cause is visible without scrolling (e.g. missing .env credentials).
+    failed && state.logs.length > 0
+      ? `Worker output:\n${state.logs.map((l) => `  ${l}`).join('\n')}`
+      : null,
     '',
     `## Records (${offset}–${offset + pageRecords.length} of ${state.records.length})`,
     pageRecords.length > 0
@@ -197,7 +213,7 @@ export async function handleInspectExecution(
           .join('\n')}`
       : '## Validation: No issues',
     '',
-    state.logs.length > 0
+    !failed && state.logs.length > 0
       ? `## Recent Logs\n${state.logs
           .slice(-10)
           .map((l) => `  ${l}`)

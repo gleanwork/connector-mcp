@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { runCopier } from '../core/copier-runner.js';
 import { setProjectPath } from '../session.js';
 import { atomicWriteFileSync } from '../core/fs-utils.js';
+import { formatNextSteps } from './workflow.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -77,8 +78,18 @@ export async function handleCreateConnector(params: CreateConnectorParams) {
           `Connector "${params.name}" created at ${projectPath}.`,
           `CLAUDE.md written.`,
           `Active project path set to: ${projectPath}`,
-          ``,
-          `Next step: describe your data source and use set_config to define the connector configuration.`,
+          formatNextSteps([
+            {
+              label: 'Set Config',
+              description: 'define auth, endpoint, and pagination settings',
+              tool: 'set_config',
+            },
+            {
+              label: 'Infer Schema',
+              description: 'parse a sample data file to detect field types',
+              tool: 'infer_schema',
+            },
+          ]),
         ].join('\n'),
       },
     ],
