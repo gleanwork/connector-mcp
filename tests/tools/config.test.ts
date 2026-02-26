@@ -60,3 +60,14 @@ describe('set_config', () => {
     expect(saved['page_size']).toBe(100);
   });
 });
+
+describe("set_config follow-up", () => {
+  it("includes a What's next block", async () => {
+    const result = await handleSetConfig(
+      { config: { endpoint: 'https://api.example.com' } },
+      projectPath,
+    );
+    expect(result.content[0].text).toContain("What's next?");
+    expect(result.content[0].text).toContain('`infer_schema`');
+  });
+});
