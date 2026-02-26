@@ -39,6 +39,15 @@ describe('infer_schema', () => {
     );
     expect(result.content[0].text).toContain('Error');
   });
+
+  it("includes a What's next block on success", async () => {
+    const result = await handleInferSchema(
+      { file_path: join(projectPath, 'sample.csv'), save: false },
+      projectPath,
+    );
+    expect(result.content[0].text).toContain("What's next?");
+    expect(result.content[0].text).toContain('`update_schema`');
+  });
 });
 
 describe('get_schema', () => {
@@ -65,6 +74,15 @@ describe('update_schema', () => {
       readFileSync(join(projectPath, '.glean/schema.json'), 'utf8'),
     ) as { fields: { name: string }[] };
     expect(saved.fields[0].name).toBe('id');
+  });
+
+  it("includes a What's next block", async () => {
+    const result = await handleUpdateSchema(
+      { fields: [{ name: 'id', type: 'string', required: true }] },
+      projectPath,
+    );
+    expect(result.content[0].text).toContain("What's next?");
+    expect(result.content[0].text).toContain('`confirm_mappings`');
   });
 });
 

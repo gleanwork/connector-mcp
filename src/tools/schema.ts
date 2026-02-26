@@ -8,6 +8,7 @@ import {
 } from '../lib/schema-store.js';
 import { GLEAN_DOCUMENT_FIELDS } from '../lib/glean-entity-model.js';
 import { getProjectPath } from '../session.js';
+import { formatNextSteps } from './workflow.js';
 
 // ── infer_schema ─────────────────────────────────────────────────
 
@@ -54,7 +55,27 @@ export async function handleInferSchema(
       lines.push(`\nSchema saved to .glean/schema.json`);
     }
 
-    return { content: [{ type: 'text' as const, text: lines.join('\n') }] };
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text:
+            lines.join('\n') +
+            formatNextSteps([
+              {
+                label: 'Update Schema',
+                description: 'save the detected fields, adjusting types if needed',
+                tool: 'update_schema',
+              },
+              {
+                label: 'Analyze Field',
+                description: 'deep-dive on a specific field before committing',
+                tool: 'analyze_field',
+              },
+            ]),
+        },
+      ],
+    };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     return {
@@ -116,7 +137,20 @@ export async function handleUpdateSchema(
     content: [
       {
         type: 'text' as const,
-        text: `Schema updated with ${params.fields.length} field(s). Saved to .glean/schema.json.\n\nNext: call get_mappings to map these fields to Glean's entity model.`,
+        text:
+          `Schema updated with ${params.fields.length} field(s). Saved to .glean/schema.json.\n\nNext: call get_mappings to map these fields to Glean's entity model.` +
+          formatNextSteps([
+            {
+              label: 'Map Fields',
+              description: "view how source fields map to Glean's entity model",
+              tool: 'get_mappings',
+            },
+            {
+              label: 'Confirm Mappings',
+              description: 'save field mapping decisions',
+              tool: 'confirm_mappings',
+            },
+          ]),
       },
     ],
   };
