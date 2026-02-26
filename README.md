@@ -59,16 +59,16 @@ Or call `get_started` — the assistant will ask what you're connecting and walk
 
 Eight steps from zero to a running connector. The assistant guides you through each one.
 
-| Step | What you're doing | Tool |
-| ---- | ----------------- | ---- |
-| 1 | Scaffold the project | `create_connector` |
-| 2 | Configure the data source | `set_config` |
-| 3 | Detect field types from a sample file | `infer_schema` |
-| 4 | Define or refine field definitions | `update_schema` |
-| 5 | Map source fields to Glean's entity model | `confirm_mappings` |
-| 6 | Verify all required Glean fields are covered | `validate_mappings` |
-| 7 | Generate the Python connector code | `build_connector` |
-| 8 | Run the connector and inspect results | `run_connector` + `inspect_execution` |
+| Step | What you're doing                            | Tool                                  |
+| ---- | -------------------------------------------- | ------------------------------------- |
+| 1    | Scaffold the project                         | `create_connector`                    |
+| 2    | Configure the data source                    | `set_config`                          |
+| 3    | Detect field types from a sample file        | `infer_schema`                        |
+| 4    | Define or refine field definitions           | `update_schema`                       |
+| 5    | Map source fields to Glean's entity model    | `confirm_mappings`                    |
+| 6    | Verify all required Glean fields are covered | `validate_mappings`                   |
+| 7    | Generate the Python connector code           | `build_connector`                     |
+| 8    | Run the connector and inspect results        | `run_connector` + `inspect_execution` |
 
 ## Tool Reference
 
@@ -83,11 +83,11 @@ Eight steps from zero to a running connector. The assistant guides you through e
 
 ### Schema
 
-| Tool            | Description                                                       |
-| --------------- | ----------------------------------------------------------------- |
-| `infer_schema`  | Parse a `.csv`, `.json`, or `.ndjson` file and return field analysis |
-| `get_schema`    | Read current `.glean/schema.json`                                 |
-| `update_schema` | Write field definitions to `.glean/schema.json`                   |
+| Tool            | Description                                                           |
+| --------------- | --------------------------------------------------------------------- |
+| `infer_schema`  | Parse a `.csv`, `.json`, or `.ndjson` file and return field analysis  |
+| `get_schema`    | Read current `.glean/schema.json`                                     |
+| `update_schema` | Write field definitions to `.glean/schema.json`                       |
 | `analyze_field` | Deep-dive on a single field: samples, type, Glean mapping suggestions |
 
 ### Field Mapping
