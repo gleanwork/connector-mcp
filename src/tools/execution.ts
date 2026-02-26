@@ -12,6 +12,7 @@ import {
 } from '../lib/execution-store.js';
 import { getLogger } from '../lib/logger.js';
 import { getProjectPath } from '../session.js';
+import { formatNextSteps } from './workflow.js';
 
 const logger = getLogger('execution');
 
@@ -129,7 +130,13 @@ export async function handleRunConnector(
           `connector: ${params.connector_name ?? 'Connector'}`,
           ``,
           `Poll status with: inspect_execution { "execution_id": "${executionId}" }`,
-        ].join('\n'),
+        ].join('\n') + formatNextSteps([
+          {
+            label: 'Inspect Execution',
+            description: 'check status and view ingested records',
+            tool: 'inspect_execution',
+          },
+        ]),
       },
     ],
   };

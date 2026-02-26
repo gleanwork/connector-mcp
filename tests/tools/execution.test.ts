@@ -33,6 +33,13 @@ describe('run_connector', () => {
     );
     expect(result.content[0].text).toContain('execution_id');
   });
+
+  it("includes inspect_execution in What's next", async () => {
+    const { handleRunConnector } = await import('../../src/tools/execution.js');
+    const result = await handleRunConnector({ connector_name: 'Connector' }, projectPath);
+    expect(result.content[0].text).toContain("What's next?");
+    expect(result.content[0].text).toContain('`inspect_execution`');
+  });
 });
 
 describe('inspect_execution', () => {

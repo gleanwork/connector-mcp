@@ -14,6 +14,7 @@ import {
 } from '../types/index.js';
 import { readStoredSchema, toGeneratorInput } from '../lib/schema-store.js';
 import { getProjectPath } from '../session.js';
+import { formatNextSteps } from './workflow.js';
 
 export const buildConnectorSchema = z.object({
   dry_run: z
@@ -155,7 +156,18 @@ export async function handleBuildConnector(
               generated.models,
               '',
               'Run build_connector with dry_run: false to write these files.',
-            ].join('\n'),
+            ].join('\n') + formatNextSteps([
+              {
+                label: 'Write Files',
+                description: 'run build_connector with dry_run: false to write the files',
+                tool: 'build_connector',
+              },
+              {
+                label: 'Run Connector',
+                description: 'execute the connector and start ingesting data',
+                tool: 'run_connector',
+              },
+            ]),
           },
         ],
       };
@@ -179,7 +191,13 @@ export async function handleBuildConnector(
             `  src/${moduleName}/mock_data.json — sample data for local testing`,
             '',
             'Next: run run_connector to test execution against your data source.',
-          ].join('\n'),
+          ].join('\n') + formatNextSteps([
+            {
+              label: 'Run Connector',
+              description: 'execute the connector and start ingesting data',
+              tool: 'run_connector',
+            },
+          ]),
         },
       ],
     };

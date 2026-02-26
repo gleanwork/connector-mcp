@@ -85,4 +85,16 @@ describe('build_connector', () => {
     const result = await handleBuildConnector({ dry_run: true }, projectPath);
     expect(result.content[0].text).toContain('Error');
   });
+
+  it("includes run_connector in What's next after dry_run preview", async () => {
+    const result = await handleBuildConnector({ dry_run: true }, projectPath);
+    expect(result.content[0].text).toContain("What's next?");
+    expect(result.content[0].text).toContain('`run_connector`');
+  });
+
+  it("includes run_connector in What's next after writing files", async () => {
+    const result = await handleBuildConnector({ dry_run: false }, projectPath);
+    expect(result.content[0].text).toContain("What's next?");
+    expect(result.content[0].text).toContain('`run_connector`');
+  });
 });
