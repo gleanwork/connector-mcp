@@ -147,6 +147,9 @@ export class WorkerPool {
     }
 
     if (!proc.pid) {
+      // Absorb the async ENOENT error event Node.js emits when the command
+      // does not exist — without this listener it crashes the process.
+      proc.on('error', () => {});
       log.error('Worker spawn failed: no PID assigned');
       return failure(new WorkerSpawnError(projectPath, 'No PID assigned'));
     }
