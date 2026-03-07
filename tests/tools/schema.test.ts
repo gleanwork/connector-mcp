@@ -102,6 +102,20 @@ describe('analyze_field', () => {
     expect(result.content[0].text).toContain('email');
   });
 
+  it('returns non-empty samples after infer_schema with save:true (CHK-002)', async () => {
+    await handleInferSchema(
+      { file_path: join(projectPath, 'sample.csv'), save: true },
+      projectPath,
+    );
+    const result = await handleAnalyzeField(
+      { field_name: 'email' },
+      projectPath,
+    );
+    const text = result.content[0].text;
+    expect(text).toContain('Samples:');
+    expect(text).toContain('alice@test.com');
+  });
+
   it('returns not found for unknown field', async () => {
     writeFileSync(
       join(projectPath, '.glean/schema.json'),
