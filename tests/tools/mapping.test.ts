@@ -35,6 +35,13 @@ describe('get_mappings', () => {
     const result = await handleGetMappings({}, emptyPath);
     expect(result.content[0].text).toContain('No schema');
   });
+
+  it('includes permissions guidance note', async () => {
+    const result = await handleGetMappings({}, projectPath);
+    const text = result.content[0].text;
+    expect(text).toContain('permissions');
+    expect(text).toContain('allow_anonymous_access');
+  });
 });
 
 describe('confirm_mappings', () => {
@@ -110,5 +117,16 @@ describe('validate_mappings', () => {
     const result = await handleValidateMappings({}, projectPath);
     expect(result.content[0].text).toContain("What's next?");
     expect(result.content[0].text).toContain('`confirm_mappings`');
+  });
+
+  it('includes actionable hint when permissions field is missing', async () => {
+    writeFileSync(
+      join(projectPath, '.glean/mappings.json'),
+      JSON.stringify({ mappings: [] }),
+    );
+    const result = await handleValidateMappings({}, projectPath);
+    const text = result.content[0].text;
+    expect(text).toContain('permissions');
+    expect(text).toContain('anonymous access');
   });
 });
