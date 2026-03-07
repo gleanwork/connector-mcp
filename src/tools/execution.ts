@@ -238,14 +238,12 @@ export const manageRecordingSchema = z.object({
     .string()
     .optional()
     .describe('Connector class name (required for record/replay)'),
-  recording_path: z
-    .string()
-    .optional()
-    .describe('Path to recording file (required for replay)'),
   recording_id: z
     .string()
     .optional()
-    .describe('Recording ID (required for delete)'),
+    .describe(
+      "Recording ID to replay or delete (use manage_recording with action 'list' to see available IDs)",
+    ),
 });
 
 export async function handleManageRecording(
@@ -393,12 +391,12 @@ export async function handleManageRecording(
     }
 
     case 'replay': {
-      if (!params.recording_path) {
+      if (!params.recording_id) {
         return {
           content: [
             {
               type: 'text' as const,
-              text: 'Error: recording_path is required for replay action.',
+              text: "Error: recording_id is required for replay action. Use manage_recording with action 'list' to see available IDs.",
             },
           ],
         };
@@ -406,7 +404,7 @@ export async function handleManageRecording(
       return handleRunConnector(
         {
           connector_name: params.connector_name ?? 'Connector',
-          recording_id: params.recording_path,
+          recording_id: params.recording_id,
         },
         projectPath,
       );
