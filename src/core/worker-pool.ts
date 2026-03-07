@@ -63,7 +63,14 @@ export class WorkerCommunicationError extends WorkerError {
 
 function getWorkerCommand(): string[] {
   const cmd = process.env['GLEAN_WORKER_COMMAND'];
-  if (cmd) return cmd.split(' ');
+  if (cmd) {
+    // JSON array format (e.g. `["path with spaces/bin", "arg"]`) allows paths
+    // that contain spaces. Plain strings are split on whitespace as before.
+    if (cmd.startsWith('[')) {
+      return JSON.parse(cmd) as string[];
+    }
+    return cmd.split(' ');
+  }
   return ['uv', 'run', 'python', '-m', 'glean.indexing.worker'];
 }
 

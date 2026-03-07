@@ -69,13 +69,31 @@ function analyzeField(
 
   return {
     name,
-    detectedType: detectType(nonNull[0]),
+    detectedType: majorityType(nonNull),
     nullRate:
       values.length > 0 ? (values.length - nonNull.length) / values.length : 0,
     cardinality,
     samples,
     totalRecords: records.length,
   };
+}
+
+function majorityType(values: unknown[]): FieldAnalysis['detectedType'] {
+  if (values.length === 0) return 'null';
+  const counts = new Map<FieldAnalysis['detectedType'], number>();
+  for (const v of values) {
+    const t = detectType(v);
+    counts.set(t, (counts.get(t) ?? 0) + 1);
+  }
+  let best: FieldAnalysis['detectedType'] = 'null';
+  let bestCount = 0;
+  for (const [type, count] of counts) {
+    if (count > bestCount) {
+      bestCount = count;
+      best = type;
+    }
+  }
+  return best;
 }
 
 function detectType(value: unknown): FieldAnalysis['detectedType'] {
