@@ -55,7 +55,7 @@ function getTemplatePath(): string {
   }
 
   // Production fallback: use the published GitHub template directly
-  return 'git+ssh://git@github.com/gleanwork/copier-glean-connector.git';
+  return 'https://github.com/gleanwork/copier-glean-connector.git';
 }
 
 export interface CopierData {
