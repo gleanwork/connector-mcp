@@ -93,6 +93,7 @@ export async function handleRunConnector(
           status: 'complete',
           completedAt: new Date(),
         });
+        void pool.kill(workerId);
       } else if (msg['method'] === 'error') {
         const p = msg['params'] as { message?: string } | undefined;
         updateExecution(executionId, {
@@ -100,6 +101,7 @@ export async function handleRunConnector(
           error: p?.message ?? 'Unknown error',
           completedAt: new Date(),
         });
+        void pool.kill(workerId);
       }
     });
 
@@ -344,6 +346,7 @@ export async function handleManageRecording(
                 'Recording saved',
               );
             }
+            void pool.kill(workerId);
           } else if (msg['method'] === 'error') {
             manager.cancelRecording();
             const p = msg['params'] as { message?: string } | undefined;
@@ -352,6 +355,7 @@ export async function handleManageRecording(
               error: p?.message ?? 'Unknown error',
               completedAt: new Date(),
             });
+            void pool.kill(workerId);
           }
         });
 
