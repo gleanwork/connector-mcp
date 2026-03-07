@@ -30,6 +30,7 @@ Call \`build_connector\` with \`dry_run: true\` first to review the generated co
 If it looks correct, call \`build_connector\` with \`dry_run: false\` to write the files.
 
 ## Step 6: Run and inspect
+Before running for the first time, run \`uv sync\` in the project directory to install dependencies.
 Call \`run_connector\` — returns an \`execution_id\` immediately.
 Call \`inspect_execution\` with that ID to check status, see records, and review validation results.
 If records have issues, return to Step 3 or 4 to refine schema/mappings, then rebuild and rerun.
