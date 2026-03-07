@@ -97,4 +97,39 @@ describe('build_connector', () => {
     expect(result.content[0].text).toContain("What's next?");
     expect(result.content[0].text).toContain('`run_connector`');
   });
+
+  it('preserves CONCAT transform from mappings into generated connector', async () => {
+    // Set up a mapping with a CONCAT transform on a composite title field
+    writeFileSync(
+      join(projectPath, '.glean/schema.json'),
+      JSON.stringify({
+        fields: [
+          { name: 'id', type: 'string', required: true },
+          { name: 'first_name', type: 'string', required: true },
+          { name: 'last_name', type: 'string', required: true },
+        ],
+      }),
+    );
+    writeFileSync(
+      join(projectPath, '.glean/mappings.json'),
+      JSON.stringify({
+        mappings: [
+          { source_field: 'id', glean_field: 'datasourceObjectId' },
+          {
+            source_field: 'first_name',
+            glean_field: 'title',
+            transform: 'concat',
+          },
+        ],
+      }),
+    );
+
+    const result = await handleBuildConnector({ dry_run: true }, projectPath);
+    const text = result.content[0].text;
+
+    // The generated connector should use join() for concat, not direct field access
+    expect(text).toContain("' '.join(");
+    // Direct field access pattern should not be used for the title mapping
+    expect(text).not.toContain('record["first_name"]');
+  });
 });

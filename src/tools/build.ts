@@ -7,6 +7,8 @@ import {
   type GeneratorOptions,
 } from '../core/code-generator.js';
 import {
+  TransformType,
+  type FieldTransform,
   type MappingState,
   type MappingDecision,
   type MappingStatus,
@@ -34,6 +36,53 @@ export const buildConnectorSchema = z.object({
     .default('basic')
     .describe('Connector base class type'),
 });
+
+/**
+ * Convert a stored transform string (e.g. "concat") to a FieldTransform object
+ * suitable for the code generator. Returns null for direct/absent transforms.
+ */
+function storedTransformToFieldTransform(
+  transform: string | null | undefined,
+  sourcePath: string,
+): FieldTransform | null {
+  if (!transform) return null;
+
+  const normalised = transform.trim().toLowerCase();
+
+  switch (normalised) {
+    case TransformType.CONCAT:
+      return {
+        transform_type: TransformType.CONCAT,
+        source_paths: [sourcePath],
+      };
+    case TransformType.TEMPLATE:
+      return {
+        transform_type: TransformType.TEMPLATE,
+        template: `{${sourcePath}}`,
+        source_paths: [sourcePath],
+      };
+    case TransformType.EXTRACT:
+      return {
+        transform_type: TransformType.EXTRACT,
+        template: '',
+        source_paths: [sourcePath],
+      };
+    case TransformType.DEFAULT:
+      return {
+        transform_type: TransformType.DEFAULT,
+        default_value: null,
+        source_paths: [sourcePath],
+      };
+    case TransformType.CUSTOM:
+      return {
+        transform_type: TransformType.CUSTOM,
+        source_paths: [sourcePath],
+      };
+    case TransformType.DIRECT:
+    default:
+      return null;
+  }
+}
 
 export async function handleBuildConnector(
   params: z.infer<typeof buildConnectorSchema>,
@@ -98,7 +147,7 @@ export async function handleBuildConnector(
     field_mapping: {
       source_path: m.source_field,
       target_field: m.glean_field,
-      transform: null,
+      transform: storedTransformToFieldTransform(m.transform, m.source_field),
       confidence: 1,
     },
     status: 'confirmed' as MappingStatus,
