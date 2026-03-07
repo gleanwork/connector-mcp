@@ -67,7 +67,15 @@ function getWorkerCommand(): string[] {
     // JSON array format (e.g. `["path with spaces/bin", "arg"]`) allows paths
     // that contain spaces. Plain strings are split on whitespace as before.
     if (cmd.startsWith('[')) {
-      return JSON.parse(cmd) as string[];
+      try {
+        return JSON.parse(cmd) as string[];
+      } catch {
+        logger.warn(
+          { cmd },
+          'GLEAN_WORKER_COMMAND looked like JSON but failed to parse; falling back to whitespace split',
+        );
+        return cmd.split(' ');
+      }
     }
     return cmd.split(' ');
   }

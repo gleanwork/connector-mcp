@@ -11,6 +11,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { atomicWriteFileSync } from '../core/fs-utils.js';
+import { getLogger } from './logger.js';
+
+const logger = getLogger('schema-store');
 import {
   FieldType,
   SchemaSourceType,
@@ -62,6 +65,18 @@ export function readStoredSchema(projectPath: string): StoredSchema | null {
       })),
     );
     return { fields };
+  }
+
+  if (
+    typeof raw !== 'object' ||
+    raw === null ||
+    !Array.isArray(raw['fields'])
+  ) {
+    logger.warn(
+      { path: p },
+      'schema.json is malformed (missing fields array); ignoring',
+    );
+    return null;
   }
 
   return raw as unknown as StoredSchema;
