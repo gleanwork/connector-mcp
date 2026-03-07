@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createServer } from './server.js';
+import { getWorkerPool } from './core/worker-pool.js';
 
 function warnIfUvMissing(): void {
   try {
@@ -14,6 +15,18 @@ function warnIfUvMissing(): void {
     );
   }
 }
+
+async function shutdown(): Promise<void> {
+  await getWorkerPool().killAll();
+  process.exit(0);
+}
+
+process.on('SIGINT', () => {
+  void shutdown();
+});
+process.on('SIGTERM', () => {
+  void shutdown();
+});
 
 async function main() {
   warnIfUvMissing();
