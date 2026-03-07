@@ -16,8 +16,9 @@ This project uses the Glean Connector MCP server. The following workflow is avai
 - `.glean/schema.json` — field schema (source of truth)
 - `.glean/mappings.json` — field mappings to Glean entity model
 - `.glean/config.json` — connector configuration
-- `connector.py` — generated connector (do not hand-edit; regenerate instead)
-- `client.py` — generated data client
+- `src/<module_name>/connector.py` — generated connector (do not hand-edit; regenerate instead)
+- `src/<module_name>/models.py` — generated SourceDocument TypedDict
+- `src/<module_name>/mock_data.json` — sample data for local testing
 
 ## MCP Tools Available
 
