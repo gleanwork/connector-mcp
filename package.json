@@ -6,7 +6,7 @@
   "author": "Steve Calvert <steve.calvert@glean.com>",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/gleanwork/glean-connector-mcp.git"
+    "url": "git+ssh://git@github.com/gleanwork/connector-mcp.git"
   },
   "keywords": [
     "mcp",
