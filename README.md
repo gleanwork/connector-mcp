@@ -9,7 +9,7 @@ An MCP server for AI-assisted Glean connector development. Add it to your IDE's 
 
 ## Prerequisites
 
-- Node.js ≥ 18
+- Node.js ≥ 20
 - Python + [uv](https://docs.astral.sh/uv/) (for `run_connector` and Copier scaffolding)
 - A Glean API token
 

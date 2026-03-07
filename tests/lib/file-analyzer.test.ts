@@ -186,7 +186,7 @@ describe('detectType heuristics', () => {
   });
 
   it('uses first non-null value type for mixed fields', () => {
-    // Current implementation: detectType is called on the first non-null value
+    // Current implementation: majority-vote across all non-null values; ties broken by first-seen order
     const path = write(
       'mixed.json',
       JSON.stringify([{ x: 42 }, { x: 'text' }, { x: null }]),
