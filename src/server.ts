@@ -160,7 +160,11 @@ export function createServer(): McpServer {
     {
       description:
         'Write connector configuration to .glean/config.json. ' +
-        'Merges with existing config. Common keys: auth_type, endpoint, page_size.',
+        'Merges with existing config. ' +
+        'Code-generation keys (consumed by build_connector): name, display_name, ' +
+        'datasource_category, url_regex, icon_url, connector_type. ' +
+        'Runtime-only keys (used by the connector at execution time, not during code generation): ' +
+        'auth_type, endpoint, api_key_header, page_size, rate_limit_rps.',
       inputSchema: setConfigSchema,
     },
     (params) => handleSetConfig(params, getProjectPath()),
