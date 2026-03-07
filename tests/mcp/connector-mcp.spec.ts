@@ -204,16 +204,44 @@ test.describe('Build Tool', () => {
 // ── Execution Tools ──────────────────────────────────────────────
 
 test.describe('Execution Tools', () => {
-  test.skip('run_connector returns an execution_id immediately', async ({
-    mcp,
-  }) => {
-    // Requires uv to spawn the Python worker — skipped in environments without uv.
+  test('run_connector returns an execution_id immediately', async ({ mcp }) => {
+    // run_connector spawns the Python worker asynchronously and returns
+    // execution_id before the worker finishes (or even starts). This test
+    // verifies the MCP protocol boundary: the tool accepts input, creates an
+    // execution record, and returns a well-formed response. Whether the worker
+    // subsequently succeeds or fails is irrelevant here.
     const result = await mcp.callTool('run_connector', {
       connector_name: 'Connector',
     });
     expect(result.isError).toBeFalsy();
     const text = result.content[0].text as string;
     expect(text).toContain('execution_id');
+  });
+
+  test('inspect_execution returns status for a run_connector execution', async ({
+    mcp,
+  }) => {
+    // Start an execution and capture its ID from the response text.
+    const runResult = await mcp.callTool('run_connector', {
+      connector_name: 'Connector',
+    });
+    expect(runResult.isError).toBeFalsy();
+    const runText = runResult.content[0].text as string;
+
+    const match = runText.match(/execution_id:\s*(\S+)/);
+    expect(match).not.toBeNull();
+    const executionId = match![1];
+
+    // inspect_execution must return a well-formed status block for that ID.
+    // The execution may be running or failed (no Python worker required) —
+    // both are acceptable outcomes for this E2E boundary test.
+    const inspectResult = await mcp.callTool('inspect_execution', {
+      execution_id: executionId,
+    });
+    expect(inspectResult.isError).toBeFalsy();
+    const inspectText = inspectResult.content[0].text as string;
+    expect(inspectText).toContain(`Execution ${executionId}`);
+    expect(inspectText).toContain('Status:');
   });
 
   test('inspect_execution returns not found for unknown id', async ({
