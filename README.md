@@ -43,8 +43,10 @@ These are set in the MCP server config, not in your connector project.
 | Variable                        | Required | Description                                                                            |
 | ------------------------------- | -------- | -------------------------------------------------------------------------------------- |
 | `GLEAN_PROJECT_PATH`            | No       | Default project directory; overridden by `create_connector`                            |
-| `GLEAN_CONNECTOR_TEMPLATE_PATH` | No       | Path to a custom Copier template (defaults to `glean-connector-project` in workspace)  |
+| `GLEAN_CONNECTOR_TEMPLATE_PATH` | No       | Path to a custom Copier template (defaults to `copier-glean-connector` in workspace)   |
 | `GLEAN_WORKER_COMMAND`          | No       | Command to start the Python worker (default: `uv run python -m glean.indexing.worker`) |
+| `GLEAN_WORKER_REQUEST_TIMEOUT`  | No       | Max seconds to wait for a worker JSON-RPC response (default: 30)                       |
+| `GLEAN_WORKER_SHUTDOWN_TIMEOUT` | No       | Seconds to wait for graceful worker shutdown before SIGKILL (default: 5)               |
 
 `GLEAN_INSTANCE` and `GLEAN_API_TOKEN` belong in your connector project's `.env` file — `create_connector` generates a `.env.example` to get you started.
 
@@ -58,18 +60,16 @@ Or call `get_started` — the assistant will ask what you're connecting and walk
 
 ## Core Workflow
 
-Eight steps from zero to a running connector. The assistant guides you through each one.
+Six steps from zero to a running connector. The assistant guides you through each one.
 
-| Step | What you're doing                            | Tool                                  |
-| ---- | -------------------------------------------- | ------------------------------------- |
-| 1    | Scaffold the project                         | `create_connector`                    |
-| 2    | Configure the data source                    | `set_config`                          |
-| 3    | Detect field types from a sample file        | `infer_schema`                        |
-| 4    | Define or refine field definitions           | `update_schema`                       |
-| 5    | Map source fields to Glean's entity model    | `confirm_mappings`                    |
-| 6    | Verify all required Glean fields are covered | `validate_mappings`                   |
-| 7    | Generate the Python connector code           | `build_connector`                     |
-| 8    | Run the connector and inspect results        | `run_connector` + `inspect_execution` |
+| Step | What you're doing                                        | Tool                                     |
+| ---- | -------------------------------------------------------- | ---------------------------------------- |
+| 1    | Scaffold the project                                     | `create_connector`                       |
+| 2    | Configure the data source                                | `set_config`                             |
+| 3    | Define the schema (infer from a sample file or write it) | `infer_schema` + `update_schema`         |
+| 4    | Map fields and verify required Glean fields are covered  | `confirm_mappings` + `validate_mappings` |
+| 5    | Generate the Python connector code                       | `build_connector`                        |
+| 6    | Run the connector and inspect results                    | `run_connector` + `inspect_execution`    |
 
 ## Tool Reference
 

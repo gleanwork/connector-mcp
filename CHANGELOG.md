@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release of `@gleanwork/connector-mcp`, an MCP server for AI-assisted Glean connector development.
 - Server exposes 14 tools and one resource over the MCP stdio transport.
-- Startup dependency validation: the server checks that `uv` is available in `PATH` and exits with a helpful error if it is not.
+- Startup dependency validation: the server checks that `uv` is available in `PATH` and logs a warning to stderr and continues running if it is not.
 - `GLEAN_WORKER_COMMAND` environment variable to override the Python worker command (default: `uv run python -m glean.indexing.worker`).
 
 #### Schema Tools
