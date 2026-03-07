@@ -324,6 +324,10 @@ function generateFieldAssignment(mapping: MappingDecision): string | null {
     case 'permissions':
       return `                permissions=DocumentPermissionsDefinition(\n                    allow_anonymous_access=${access},\n                ),`;
     default:
+      logger.warn(
+        { target_field: target },
+        'Unrecognized target_field in mapping — assignment will be skipped',
+      );
       return null;
   }
 }
@@ -455,7 +459,8 @@ function escPy(s: string): string {
     .replace(/\r/g, '\\r')
     .replace(/\t/g, '\\t')
     .replace(/\0/g, '\\0')
-    .replace(/"/g, '\\"');
+    .replace(/"/g, '\\"')
+    .replace(/'/g, "\\'");
 }
 
 function toPythonLiteral(value: unknown): string {
