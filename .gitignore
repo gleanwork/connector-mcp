@@ -7,3 +7,4 @@ coverage/
 test-results/
 test-server.mjs
 docs/plans
+.worktrees/
