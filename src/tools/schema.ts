@@ -47,9 +47,21 @@ export async function handleInferSchema(
           type: f.detectedType,
           required: f.nullRate === 0,
         })),
-        sampleData: analyses[0]?.samples
-          ? analyses[0].samples.slice(0, 10).map((s) => ({ value: s }))
-          : undefined,
+        sampleData: (() => {
+          if (analyses.length === 0) return undefined;
+          const maxSamples = Math.max(...analyses.map((a) => a.samples.length));
+          const rows: Record<string, unknown>[] = [];
+          for (let i = 0; i < Math.min(maxSamples, 10); i++) {
+            const row: Record<string, unknown> = {};
+            for (const analysis of analyses) {
+              if (i < analysis.samples.length) {
+                row[analysis.name] = analysis.samples[i];
+              }
+            }
+            rows.push(row);
+          }
+          return rows;
+        })(),
       };
       writeStoredSchema(projectPath, schema);
       lines.push(`\nSchema saved to .glean/schema.json`);
