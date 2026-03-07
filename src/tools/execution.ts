@@ -228,23 +228,47 @@ export async function handleInspectExecution(
 
 // ── manage_recording ─────────────────────────────────────────────
 
-export const manageRecordingSchema = z.object({
-  action: z
-    .enum(['record', 'replay', 'list', 'delete'])
-    .describe(
-      'record: run and save output | replay: run from a saved file | list: show recordings | delete: remove a recording',
-    ),
-  connector_name: z
-    .string()
-    .optional()
-    .describe('Connector class name (required for record/replay)'),
-  recording_id: z
-    .string()
-    .optional()
-    .describe(
-      "Recording ID to replay or delete (use manage_recording with action 'list' to see available IDs)",
-    ),
-});
+export const manageRecordingSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list').describe('Show available recordings'),
+    connector_name: z
+      .string()
+      .optional()
+      .describe('Optional filter: only show recordings for this connector'),
+  }),
+  z.object({
+    action: z
+      .literal('record')
+      .describe('Run the connector and save its output as a recording'),
+    connector_name: z
+      .string()
+      .optional()
+      .default('Connector')
+      .describe('Connector class name to run'),
+  }),
+  z.object({
+    action: z
+      .literal('replay')
+      .describe('Run the connector from a saved recording file'),
+    recording_id: z
+      .string()
+      .describe(
+        "Recording ID to replay (use manage_recording with action 'list' to see available IDs)",
+      ),
+    connector_name: z
+      .string()
+      .optional()
+      .describe('Connector class name override'),
+  }),
+  z.object({
+    action: z.literal('delete').describe('Remove a recording'),
+    recording_id: z
+      .string()
+      .describe(
+        "Recording ID to delete (use manage_recording with action 'list' to see available IDs)",
+      ),
+  }),
+]);
 
 export async function handleManageRecording(
   params: z.infer<typeof manageRecordingSchema>,
@@ -391,16 +415,6 @@ export async function handleManageRecording(
     }
 
     case 'replay': {
-      if (!params.recording_id) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: "Error: recording_id is required for replay action. Use manage_recording with action 'list' to see available IDs.",
-            },
-          ],
-        };
-      }
       return handleRunConnector(
         {
           connector_name: params.connector_name ?? 'Connector',
@@ -411,16 +425,6 @@ export async function handleManageRecording(
     }
 
     case 'delete': {
-      if (!params.recording_id) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: 'Error: recording_id is required for delete action.',
-            },
-          ],
-        };
-      }
       const deleted = manager.deleteRecording(params.recording_id);
       return {
         content: [

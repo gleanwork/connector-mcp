@@ -70,14 +70,35 @@ describe('inspect_execution', () => {
 });
 
 describe('manage_recording', () => {
-  it('returns an error for replay when no recording_id is provided', async () => {
-    const { handleManageRecording } =
+  it('rejects replay action when recording_id is missing (CHK-023)', async () => {
+    const { manageRecordingSchema } =
       await import('../../src/tools/execution.js');
-    const result = await handleManageRecording(
-      { action: 'replay' },
-      projectPath,
-    );
-    expect(result.content[0].text).toContain('recording_id');
+    const result = manageRecordingSchema.safeParse({ action: 'replay' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects delete action when recording_id is missing (CHK-023)', async () => {
+    const { manageRecordingSchema } =
+      await import('../../src/tools/execution.js');
+    const result = manageRecordingSchema.safeParse({ action: 'delete' });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts replay action with recording_id (CHK-023)', async () => {
+    const { manageRecordingSchema } =
+      await import('../../src/tools/execution.js');
+    const result = manageRecordingSchema.safeParse({
+      action: 'replay',
+      recording_id: 'rec-abc123',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts list action without recording_id (CHK-023)', async () => {
+    const { manageRecordingSchema } =
+      await import('../../src/tools/execution.js');
+    const result = manageRecordingSchema.safeParse({ action: 'list' });
+    expect(result.success).toBe(true);
   });
 
   it('acknowledges a list action', async () => {

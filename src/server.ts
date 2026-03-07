@@ -95,7 +95,8 @@ export function createServer(): McpServer {
     {
       description:
         'Write field definitions to .glean/schema.json. ' +
-        'Call this after infer_schema to save the agreed schema, or to make manual edits.',
+        'Call this after infer_schema to save the agreed schema, or to make manual edits. ' +
+        'Set merge: true to merge incoming fields with the existing schema (fields with the same name are replaced; new names are appended) instead of replacing the entire field list.',
       inputSchema: updateSchemaSchema,
     },
     (params) => handleUpdateSchema(params, getProjectPath()),

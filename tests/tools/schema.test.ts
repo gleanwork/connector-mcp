@@ -7,7 +7,9 @@ import {
   handleGetSchema,
   handleUpdateSchema,
   handleAnalyzeField,
+  updateSchemaSchema,
 } from '../../src/tools/schema.js';
+import { FieldType } from '../../src/types/index.js';
 
 let projectPath: string;
 
@@ -68,7 +70,7 @@ describe('get_schema', () => {
 
 describe('update_schema', () => {
   it('writes schema to .glean/schema.json', async () => {
-    const fields = [{ name: 'id', type: 'string', required: true }];
+    const fields = [{ name: 'id', type: FieldType.STRING, required: true }];
     await handleUpdateSchema({ fields }, projectPath);
     const saved = JSON.parse(
       readFileSync(join(projectPath, '.glean/schema.json'), 'utf8'),
@@ -78,11 +80,80 @@ describe('update_schema', () => {
 
   it("includes a What's next block", async () => {
     const result = await handleUpdateSchema(
-      { fields: [{ name: 'id', type: 'string', required: true }] },
+      { fields: [{ name: 'id', type: FieldType.STRING, required: true }] },
       projectPath,
     );
     expect(result.content[0].text).toContain("What's next?");
     expect(result.content[0].text).toContain('`confirm_mappings`');
+  });
+
+  it('rejects an invalid type string (CHK-019)', () => {
+    const result = updateSchemaSchema.safeParse({
+      fields: [{ name: 'bad', type: 'banana' }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts all valid FieldType values (CHK-019)', () => {
+    const result = updateSchemaSchema.safeParse({
+      fields: Object.values(FieldType).map((t) => ({ name: t, type: t })),
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('merges incoming fields with existing schema when merge:true (CHK-017)', async () => {
+    writeFileSync(
+      join(projectPath, '.glean/schema.json'),
+      JSON.stringify({
+        fields: [
+          { name: 'id', type: FieldType.INTEGER, required: true },
+          { name: 'name', type: FieldType.STRING, required: false },
+        ],
+      }),
+    );
+    await handleUpdateSchema(
+      {
+        fields: [
+          { name: 'name', type: FieldType.STRING, required: true },
+          { name: 'email', type: FieldType.STRING, required: false },
+        ],
+        merge: true,
+      },
+      projectPath,
+    );
+    const saved = JSON.parse(
+      readFileSync(join(projectPath, '.glean/schema.json'), 'utf8'),
+    ) as { fields: { name: string; required: boolean }[] };
+    expect(saved.fields).toHaveLength(3);
+    const nameField = saved.fields.find((f) => f.name === 'name');
+    expect(nameField?.required).toBe(true);
+    expect(saved.fields.find((f) => f.name === 'id')).toBeDefined();
+    expect(saved.fields.find((f) => f.name === 'email')).toBeDefined();
+  });
+
+  it('replaces entire field list when merge:false (CHK-017)', async () => {
+    writeFileSync(
+      join(projectPath, '.glean/schema.json'),
+      JSON.stringify({
+        fields: [
+          { name: 'old_field', type: FieldType.STRING, required: false },
+        ],
+      }),
+    );
+    await handleUpdateSchema(
+      {
+        fields: [
+          { name: 'new_field', type: FieldType.STRING, required: false },
+        ],
+        merge: false,
+      },
+      projectPath,
+    );
+    const saved = JSON.parse(
+      readFileSync(join(projectPath, '.glean/schema.json'), 'utf8'),
+    ) as { fields: { name: string }[] };
+    expect(saved.fields).toHaveLength(1);
+    expect(saved.fields[0].name).toBe('new_field');
   });
 });
 
