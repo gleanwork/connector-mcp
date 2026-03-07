@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { getStartedSchema, handleGetStarted } from './tools/get-started.js';
@@ -41,10 +42,13 @@ import {
 import { WORKFLOW_GUIDE } from './resources/workflow.js';
 import { getProjectPath } from './session.js';
 
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json') as { version: string };
+
 export function createServer(): McpServer {
   const server = new McpServer({
     name: 'glean-connector-mcp',
-    version: '0.1.0',
+    version: pkg.version,
   });
 
   server.registerTool(
