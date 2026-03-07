@@ -7,6 +7,7 @@ import {
   type StoredSchema,
 } from '../lib/schema-store.js';
 import { GLEAN_DOCUMENT_FIELDS } from '../lib/glean-entity-model.js';
+import { FieldType } from '../types/index.js';
 import { getProjectPath } from '../session.js';
 import { formatNextSteps } from './workflow.js';
 
@@ -130,12 +131,23 @@ export const updateSchemaSchema = z.object({
     .array(
       z.object({
         name: z.string(),
-        type: z.string(),
+        type: z
+          .nativeEnum(FieldType)
+          .describe(
+            `Field type. Must be one of: ${Object.values(FieldType).join(', ')}`,
+          ),
         required: z.boolean().optional().default(false),
         description: z.string().optional(),
       }),
     )
     .describe('Field definitions to write to .glean/schema.json'),
+  merge: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe(
+      'If true, merge incoming fields with the existing schema (fields with the same name are replaced; new names are appended). If false (default), the entire field list is replaced.',
+    ),
 });
 
 export async function handleUpdateSchema(
@@ -143,7 +155,21 @@ export async function handleUpdateSchema(
   projectPath = getProjectPath(),
 ) {
   const existing = readStoredSchema(projectPath) ?? { fields: [] };
-  const updated: StoredSchema = { ...existing, fields: params.fields };
+
+  let mergedFields: StoredSchema['fields'];
+  if (params.merge) {
+    const incomingByName = new Map(params.fields.map((f) => [f.name, f]));
+    const base = existing.fields.map((f) =>
+      incomingByName.has(f.name) ? incomingByName.get(f.name)! : f,
+    );
+    const existingNames = new Set(existing.fields.map((f) => f.name));
+    const appended = params.fields.filter((f) => !existingNames.has(f.name));
+    mergedFields = [...base, ...appended];
+  } else {
+    mergedFields = params.fields;
+  }
+
+  const updated: StoredSchema = { ...existing, fields: mergedFields };
   writeStoredSchema(projectPath, updated);
 
   return {
@@ -151,7 +177,7 @@ export async function handleUpdateSchema(
       {
         type: 'text' as const,
         text:
-          `Schema updated with ${params.fields.length} field(s). Saved to .glean/schema.json.\n\nNext: call get_mappings to map these fields to Glean's entity model.` +
+          `Schema updated with ${mergedFields.length} field(s)${params.merge ? ' (merged)' : ''}. Saved to .glean/schema.json.\n\nNext: call get_mappings to map these fields to Glean's entity model.` +
           formatNextSteps([
             {
               label: 'Map Fields',
