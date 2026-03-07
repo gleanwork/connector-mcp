@@ -70,6 +70,11 @@ export async function handleGetMappings(
 
   lines.push(
     '',
+    '> **Note on `permissions`:** This is a required Glean field but most source systems have no direct equivalent.',
+    '> If your data is publicly accessible, map any convenient source field (e.g. `"id"`) to `permissions` —',
+    '> the generated connector code will set `allow_anonymous_access=True` automatically.',
+    '> If you need per-user access control, map a field that contains user or group identifiers.',
+    '',
     'Use confirm_mappings to save your mapping decisions, then validate_mappings to check for gaps.',
   );
 
@@ -185,7 +190,11 @@ export async function handleValidateMappings(
               const gleanField = GLEAN_DOCUMENT_FIELDS.find(
                 (gf) => gf.name === f,
               );
-              return `  • ${f} — ${gleanField?.description ?? ''}`;
+              const hint =
+                f === 'permissions'
+                  ? ' — Map any source field (e.g. "id") to allow anonymous access, or provide a field with explicit user/group permission data.'
+                  : ` — ${gleanField?.description ?? ''}`;
+              return `  • ${f}${hint}`;
             }),
             '',
             'Use confirm_mappings to add mappings for these fields.',

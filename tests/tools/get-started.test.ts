@@ -21,4 +21,10 @@ describe('get_started', () => {
     const result = await handleGetStarted({});
     expect(result.content[0].text.toLowerCase()).toContain('sample');
   });
+
+  it("includes create_connector in What's next", async () => {
+    const result = await handleGetStarted({});
+    expect(result.content[0].text).toContain("What's next?");
+    expect(result.content[0].text).toContain('`create_connector`');
+  });
 });
