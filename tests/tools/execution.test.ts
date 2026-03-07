@@ -70,14 +70,14 @@ describe('inspect_execution', () => {
 });
 
 describe('manage_recording', () => {
-  it('returns an error for replay when no recording path is provided', async () => {
+  it('returns an error for replay when no recording_id is provided', async () => {
     const { handleManageRecording } =
       await import('../../src/tools/execution.js');
     const result = await handleManageRecording(
       { action: 'replay' },
       projectPath,
     );
-    expect(result.content[0].text).toContain('recording_path');
+    expect(result.content[0].text).toContain('recording_id');
   });
 
   it('acknowledges a list action', async () => {
