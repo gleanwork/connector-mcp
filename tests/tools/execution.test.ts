@@ -2,7 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { createExecution } from '../../src/lib/execution-store.js';
+import {
+  createExecution,
+  clearExecutions,
+} from '../../src/lib/execution-store.js';
 
 vi.mock('../../src/core/worker-pool.js', () => ({
   getWorkerPool: vi.fn().mockReturnValue({
@@ -17,6 +20,7 @@ vi.mock('../../src/core/worker-pool.js', () => ({
 let projectPath: string;
 
 beforeEach(() => {
+  clearExecutions();
   projectPath = join(
     tmpdir(),
     `exec-test-${Date.now()}-${Math.random().toString(36).slice(2)}`,

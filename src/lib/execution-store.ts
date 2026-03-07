@@ -68,6 +68,10 @@ export function listExecutions(): ExecutionState[] {
   return [...executions.values()];
 }
 
+export function clearExecutions(): void {
+  executions.clear();
+}
+
 export function summarizeValidation(
   records: ExecutionRecord[],
 ): Record<string, number> {

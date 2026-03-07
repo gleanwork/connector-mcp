@@ -9,6 +9,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { clearExecutions } from '../../src/lib/execution-store.js';
 // Note: no direct fs imports — we go through the tool handlers
 
 // Mock external process dependencies only
@@ -36,6 +37,7 @@ let parentDir: string;
 let projectPath: string;
 
 beforeEach(() => {
+  clearExecutions();
   parentDir = join(
     tmpdir(),
     `integration-${Date.now()}-${Math.random().toString(36).slice(2)}`,
