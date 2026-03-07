@@ -223,7 +223,44 @@ export async function handleInspectExecution(
       : null,
   ].filter((l): l is string => l !== null);
 
-  return { content: [{ type: 'text' as const, text: lines.join('\n') }] };
+  const nextSteps =
+    state.status === 'complete'
+      ? formatNextSteps([
+          {
+            label: 'Manage Recordings',
+            description: 'save, replay, list, or delete connector recordings',
+            tool: 'manage_recording',
+          },
+        ])
+      : state.status === 'failed'
+        ? formatNextSteps([
+            {
+              label: 'Update Schema',
+              description: 'fix field definitions before rebuilding',
+              tool: 'update_schema',
+            },
+            {
+              label: 'Get Mappings',
+              description: 'review and correct field mappings',
+              tool: 'get_mappings',
+            },
+            {
+              label: 'Build Connector',
+              description: 'regenerate connector code after fixing issues',
+              tool: 'build_connector',
+            },
+          ])
+        : formatNextSteps([
+            {
+              label: 'Inspect Execution',
+              description: 'poll again for updated status and records',
+              tool: 'inspect_execution',
+            },
+          ]);
+
+  return {
+    content: [{ type: 'text' as const, text: lines.join('\n') + nextSteps }],
+  };
 }
 
 // ── manage_recording ─────────────────────────────────────────────

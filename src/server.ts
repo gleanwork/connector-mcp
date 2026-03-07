@@ -51,8 +51,8 @@ export function createServer(): McpServer {
     'get_started',
     {
       description:
-        'Start building a Glean connector. Returns an opening prompt that orients the AI ' +
-        'and asks the user what data source they want to connect. Call this first.',
+        'Entry point for building a Glean connector. Returns an opening prompt that orients the AI ' +
+        'and asks the user what data source they want to connect. Call this before any other tool.',
       inputSchema: getStartedSchema,
     },
     handleGetStarted,
@@ -62,8 +62,8 @@ export function createServer(): McpServer {
     'create_connector',
     {
       description:
-        'Create a new Glean connector project using the standard template. ' +
-        'Run this first. Sets the active project directory for this session.',
+        'Scaffold a new Glean connector project using the standard template. ' +
+        'Call this after get_started. Sets the active project directory for this session.',
       inputSchema: createConnectorSchema,
     },
     handleCreateConnector,
