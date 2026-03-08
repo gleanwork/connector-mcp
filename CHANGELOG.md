@@ -66,4 +66,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/lib/file-analyzer.ts` — CSV, JSON, and NDJSON file parsing and field analysis.
 - `src/lib/glean-entity-model.ts` — Glean entity model definitions used for mapping validation.
 
-[0.1.0]: https://github.com/gleanwork/glean-connector-mcp/releases/tag/v0.1.0
+[0.1.0]: https://github.com/gleanwork/connector-mcp/releases/tag/v0.1.0

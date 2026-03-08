@@ -44,7 +44,13 @@ export function readStoredSchema(projectPath: string): StoredSchema | null {
   const p = schemaFilePath(projectPath);
   if (!existsSync(p)) return null;
 
-  const raw = JSON.parse(readFileSync(p, 'utf8')) as Record<string, unknown>;
+  let raw: Record<string, unknown>;
+  try {
+    raw = JSON.parse(readFileSync(p, 'utf8')) as Record<string, unknown>;
+  } catch {
+    logger.warn({ path: p }, 'schema.json contains invalid JSON; ignoring');
+    return null;
+  }
 
   // Legacy SchemaDefinition format — convert to flat StoredSchema
   if (Array.isArray(raw['entities'])) {
