@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.5.0 (2026-03-08)
+
+#### :rocket: Enhancement
+
+- [#3](https://github.com/gleanwork/connector-mcp/pull/3) feat: guided workflow — get_started tool and What's next? follow-ups ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#2](https://github.com/gleanwork/connector-mcp/pull/2) feat: guided workflow — get_started tool and What's next? follow-ups ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#1](https://github.com/gleanwork/connector-mcp/pull/1) feat: generate IDE client configs via mcp-config-schema, sync to docs ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+
+#### :bug: Bug Fix
+
+- [#22](https://github.com/gleanwork/connector-mcp/pull/22) fix: pre-release polish — CHANGELOG URL, schema-store JSON.parse safety ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#21](https://github.com/gleanwork/connector-mcp/pull/21) fix: verification findings — template packaging, JSON.parse safety, docs (CHK-037–041) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#19](https://github.com/gleanwork/connector-mcp/pull/19) fix: schema validation improvements (CHK-017, CHK-019, CHK-023) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#18](https://github.com/gleanwork/connector-mcp/pull/18) fix: code correctness fixes (CHK-018, CHK-020, CHK-032, CHK-033) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#17](https://github.com/gleanwork/connector-mcp/pull/17) fix: doc accuracy fixes (CHK-022, CHK-026, CHK-027, CHK-034, CHK-035) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#16](https://github.com/gleanwork/connector-mcp/pull/16) fix: server version, Node engine floor, CLAUDE.md template (CHK-016, CHK-025, CHK-030) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#15](https://github.com/gleanwork/connector-mcp/pull/15) fix: improve tool descriptions and formatNextSteps UX (CHK-021, CHK-024, CHK-028) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#12](https://github.com/gleanwork/connector-mcp/pull/12) fix: bridge get_started to create_connector and add permissions guidance (CHK-008, CHK-009) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#14](https://github.com/gleanwork/connector-mcp/pull/14) fix: correct repository URL in package.json ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#11](https://github.com/gleanwork/connector-mcp/pull/11) fix: preserve transform field from mappings in build_connector (CHK-005) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#10](https://github.com/gleanwork/connector-mcp/pull/10) fix: correct README layout, env vars, add stability badge, fix CI badge (CHK-010–013) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#8](https://github.com/gleanwork/connector-mcp/pull/8) fix: unify recording_id naming in manage_recording replay (CHK-006) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#7](https://github.com/gleanwork/connector-mcp/pull/7) fix: align set_config description with keys consumed by build_connector (CHK-003) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#7](https://github.com/gleanwork/connector-mcp/pull/7) fix: align set_config description with keys consumed by build_connector (CHK-003) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#6](https://github.com/gleanwork/connector-mcp/pull/6) fix: kill workers after execution and add SIGTERM/SIGINT cleanup (CHK-004) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#5](https://github.com/gleanwork/connector-mcp/pull/5) fix: correct sampleData shape so analyze_field returns samples (CHK-002) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#4](https://github.com/gleanwork/connector-mcp/pull/4) fix: use HTTPS for Copier template fallback (CHK-001) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+
+#### :memo: Documentation
+
+- [#16](https://github.com/gleanwork/connector-mcp/pull/16) fix: server version, Node engine floor, CLAUDE.md template (CHK-016, CHK-025, CHK-030) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+
+#### :house: Internal
+
+- [#20](https://github.com/gleanwork/connector-mcp/pull/20) test: coverage enforcement, file-analyzer tests, execution-store isolation (CHK-029, CHK-031, CHK-036) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+- [#13](https://github.com/gleanwork/connector-mcp/pull/13) test: add dedicated unit tests for WorkerPool and RecordingManager (CHK-014) ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+
+#### Committers: 1
+
+- Steve Calvert ([@steve-calvert-glean](https://github.com/steve-calvert-glean))
+
+
+
 ## [0.1.0] - 2026-02-25
 
 ### Added

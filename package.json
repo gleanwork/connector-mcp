@@ -1,6 +1,6 @@
 {
   "name": "@gleanwork/connector-mcp",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "description": "MCP server for AI-assisted Glean connector development",
   "license": "MIT",
   "author": "Steve Calvert <steve.calvert@glean.com>",
