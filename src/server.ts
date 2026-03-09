@@ -43,6 +43,12 @@ import {
   listConnectorsSchema,
   handleListConnectors,
 } from './tools/list-connectors.js';
+import {
+  getDataClientSchema,
+  updateDataClientSchema,
+  handleGetDataClient,
+  handleUpdateDataClient,
+} from './tools/data-client.js';
 import { WORKFLOW_GUIDE } from './resources/workflow.js';
 import { getProjectPath } from './session.js';
 
@@ -232,6 +238,26 @@ export function createServer(): McpServer {
       inputSchema: listConnectorsSchema,
     },
     (params) => handleListConnectors(params, getProjectPath()),
+  );
+
+  server.registerTool(
+    'get_data_client',
+    {
+      description:
+        'Read data_client.py for a module — use before asking AI to implement real API calls.',
+      inputSchema: getDataClientSchema,
+    },
+    (params) => handleGetDataClient(params, getProjectPath()),
+  );
+
+  server.registerTool(
+    'update_data_client',
+    {
+      description:
+        'Write a new data_client.py implementation (replaces the mock with real API calls).',
+      inputSchema: updateDataClientSchema,
+    },
+    (params) => handleUpdateDataClient(params, getProjectPath()),
   );
 
   // ── Resources ─────────────────────────────────────────────────
