@@ -49,6 +49,10 @@ import {
   handleGetDataClient,
   handleUpdateDataClient,
 } from './tools/data-client.js';
+import {
+  checkPrerequisitesSchema,
+  handleCheckPrerequisites,
+} from './tools/prerequisites.js';
 import { WORKFLOW_GUIDE } from './resources/workflow.js';
 import { getProjectPath } from './session.js';
 
@@ -258,6 +262,16 @@ export function createServer(): McpServer {
       inputSchema: updateDataClientSchema,
     },
     (params) => handleUpdateDataClient(params, getProjectPath()),
+  );
+
+  server.registerTool(
+    'check_prerequisites',
+    {
+      description:
+        'Check that all required tools and credentials are installed and configured.',
+      inputSchema: checkPrerequisitesSchema.shape,
+    },
+    async (params) => handleCheckPrerequisites(params),
   );
 
   // ── Resources ─────────────────────────────────────────────────
