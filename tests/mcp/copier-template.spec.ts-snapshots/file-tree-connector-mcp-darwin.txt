@@ -1,6 +1,7 @@
 .copier-answers.yml
 .github/workflows/ci.yml
 .gitignore
+.glean/session.json
 .python-version
 CLAUDE.md
 docker-compose.yml
