@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gleanwork.github.io/connector-mcp/protocol/v1.0.json",
+  "title": "Glean Connector Worker Protocol v1.0",
+  "description": "JSON-RPC 2.0 protocol between connector-mcp and glean-indexing-sdk >=1.0.0b1. This schema is the authoritative contract. No aliases or backward-compat fallbacks exist.",
+  "definitions": {
+    "ExecuteRequest": {
+      "description": "Sent by connector-mcp to start execution. Worker responds immediately with ExecuteResponse, then sends notifications asynchronously.",
+      "type": "object",
+      "required": ["jsonrpc", "method", "params", "id"],
+      "additionalProperties": false,
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "method": { "const": "execute" },
+        "id": { "type": ["string", "integer"] },
+        "params": {
+          "type": "object",
+          "required": ["connector"],
+          "additionalProperties": false,
+          "properties": {
+            "connector": { "type": "string", "description": "Exact connector class name" },
+            "step_mode": { "type": "boolean", "default": false },
+            "mock_data_path": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "ExecuteResponse": {
+      "description": "Returned immediately before any records are fetched.",
+      "type": "object",
+      "required": ["jsonrpc", "id", "result"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "type": ["string", "integer"] },
+        "result": {
+          "type": "object",
+          "required": ["execution_id", "status"],
+          "additionalProperties": false,
+          "properties": {
+            "execution_id": { "type": "string" },
+            "status": { "const": "started" }
+          }
+        }
+      }
+    },
+    "RecordFetchedNotification": {
+      "description": "Emitted once per source record fetched. No response expected.",
+      "type": "object",
+      "required": ["method", "params"],
+      "additionalProperties": false,
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "method": { "const": "record_fetched" },
+        "params": {
+          "type": "object",
+          "required": ["record_id", "index", "data"],
+          "additionalProperties": false,
+          "properties": {
+            "record_id": { "type": "string" },
+            "index": { "type": "integer", "minimum": 0 },
+            "data": { "type": "object", "description": "Raw source document" }
+          }
+        }
+      }
+    },
+    "ExecutionCompleteNotification": {
+      "description": "Emitted when execution finishes. Worker exits after this.",
+      "type": "object",
+      "required": ["method", "params"],
+      "additionalProperties": false,
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "method": { "const": "execution_complete" },
+        "params": {
+          "type": "object",
+          "required": ["execution_id", "success", "total_records"],
+          "properties": {
+            "execution_id": { "type": "string" },
+            "success": { "type": "boolean" },
+            "total_records": { "type": "integer", "minimum": 0 },
+            "successful_records": { "type": "integer", "minimum": 0 },
+            "failed_records": { "type": "integer", "minimum": 0 },
+            "total_duration_ms": { "type": "number", "minimum": 0 },
+            "error": { "type": "string" }
+          }
+        }
+      }
+    },
+    "LogNotification": {
+      "description": "Diagnostic output from the worker. No response expected.",
+      "type": "object",
+      "required": ["method", "params"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "method": { "const": "log" },
+        "params": {
+          "type": "object",
+          "required": ["level", "message"],
+          "properties": {
+            "level": { "enum": ["debug", "info", "warning", "error"] },
+            "message": { "type": "string" },
+            "source": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
