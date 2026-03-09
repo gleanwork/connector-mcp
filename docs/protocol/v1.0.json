@@ -29,6 +29,7 @@
       "description": "Returned immediately before any records are fetched.",
       "type": "object",
       "required": ["jsonrpc", "id", "result"],
+      "additionalProperties": false,
       "properties": {
         "jsonrpc": { "const": "2.0" },
         "id": { "type": ["string", "integer"] },
@@ -74,6 +75,7 @@
         "params": {
           "type": "object",
           "required": ["execution_id", "success", "total_records"],
+          "additionalProperties": false,
           "properties": {
             "execution_id": { "type": "string" },
             "success": { "type": "boolean" },

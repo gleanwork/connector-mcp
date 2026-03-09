@@ -1,4 +1,4 @@
-import { test, expect, describe } from 'vitest';
+import { it, expect, describe } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import Ajv from 'ajv';
@@ -10,7 +10,7 @@ const schema = JSON.parse(
 const ajv = new Ajv({ strict: false });
 
 describe('Protocol schema v1.0 — connector-mcp message shapes', () => {
-  test('valid ExecuteRequest passes schema', () => {
+  it('valid ExecuteRequest passes schema', () => {
     const validate = ajv.compile(
       (schema.definitions as Record<string, unknown>)['ExecuteRequest'],
     );
@@ -24,7 +24,7 @@ describe('Protocol schema v1.0 — connector-mcp message shapes', () => {
     ).toBe(true);
   });
 
-  test('ExecuteRequest with unknown field fails schema', () => {
+  it('ExecuteRequest with unknown field fails schema', () => {
     const validate = ajv.compile(
       (schema.definitions as Record<string, unknown>)['ExecuteRequest'],
     );
@@ -38,7 +38,7 @@ describe('Protocol schema v1.0 — connector-mcp message shapes', () => {
     ).toBe(false);
   });
 
-  test('valid RecordFetchedNotification passes schema', () => {
+  it('valid RecordFetchedNotification passes schema', () => {
     const validate = ajv.compile(
       (schema.definitions as Record<string, unknown>)['RecordFetchedNotification'],
     );
@@ -50,7 +50,7 @@ describe('Protocol schema v1.0 — connector-mcp message shapes', () => {
     ).toBe(true);
   });
 
-  test('old record notification method fails schema', () => {
+  it('old record notification method fails schema', () => {
     const validate = ajv.compile(
       (schema.definitions as Record<string, unknown>)['RecordFetchedNotification'],
     );
@@ -59,7 +59,7 @@ describe('Protocol schema v1.0 — connector-mcp message shapes', () => {
     ).toBe(false);
   });
 
-  test('valid ExecutionCompleteNotification passes schema', () => {
+  it('valid ExecutionCompleteNotification passes schema', () => {
     const validate = ajv.compile(
       (schema.definitions as Record<string, unknown>)['ExecutionCompleteNotification'],
     );
@@ -71,7 +71,7 @@ describe('Protocol schema v1.0 — connector-mcp message shapes', () => {
     ).toBe(true);
   });
 
-  test('valid ExecuteResponse passes schema', () => {
+  it('valid ExecuteResponse passes schema', () => {
     const validate = ajv.compile(
       (schema.definitions as Record<string, unknown>)['ExecuteResponse'],
     );
