@@ -98,6 +98,17 @@ describe('build_connector', () => {
     expect(result.content[0].text).toContain('`run_connector`');
   });
 
+  it('build_connector uses connector_name for Python class name', async () => {
+    const result = await handleBuildConnector(
+      { dry_run: true, connector_name: 'JiraConnector' },
+      projectPath,
+    );
+    expect(result.isError).toBeFalsy();
+    const text = result.content[0].text as string;
+    expect(text).toContain('class JiraConnector(');
+    expect(text).not.toContain('class Connector(');
+  });
+
   it('preserves CONCAT transform from mappings into generated connector', async () => {
     // Set up a mapping with a CONCAT transform on a composite title field
     writeFileSync(

@@ -179,7 +179,7 @@ function generateConnector(
   lines.push('');
 
   // ── Class ──
-  lines.push(`class Connector(${baseClass}[SourceDocument]):`);
+  lines.push(`class ${options.connectorName}(${baseClass}[SourceDocument]):`);
   lines.push(
     '    """Transforms source documents into Glean DocumentDefinitions."""',
   );
