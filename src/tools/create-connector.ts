@@ -35,6 +35,14 @@ This project uses the Glean Connector MCP server. The following workflow is avai
 - \`get_config\`, \`set_config\`
 - \`build_connector\`
 - \`run_connector\`, \`inspect_execution\`, \`manage_recording\`
+
+## Development Loop
+
+1. Implement \`src/<module>/data_client.py\` with real API calls — use \`get_data_client\` then \`update_data_client\`
+2. Run \`run_connector\` to test live
+3. Save a recording: \`manage_recording\` with \`action: "record"\`
+4. Replay while iterating on transforms: \`manage_recording\` with \`action: "replay"\`
+5. Use \`inspect_execution\` to verify records are correct
 `;
 
 export const createConnectorSchema = z.object({

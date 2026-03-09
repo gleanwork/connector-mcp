@@ -137,8 +137,14 @@ export async function handleRunConnector(
           formatNextSteps([
             {
               label: 'Inspect Execution',
-              description: 'check status and view ingested records',
+              description: 'check status and view fetched records',
               tool: 'inspect_execution',
+            },
+            {
+              label: 'Record This Run',
+              description:
+                'save the output as a recording to replay without hitting the API — use manage_recording with action: "record"',
+              tool: 'manage_recording',
             },
           ]),
       },
