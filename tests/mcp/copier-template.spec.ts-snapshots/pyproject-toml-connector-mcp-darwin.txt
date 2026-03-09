@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 license = "MIT"
 
 dependencies = [
-    "glean-indexing-sdk>=0.3.0",
+    "glean-indexing-sdk>=1.0.0b1,<2.0",
     "python-dotenv>=1.0.0",
 ]
 

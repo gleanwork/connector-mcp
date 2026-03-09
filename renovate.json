@@ -1,0 +1,24 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^src/manifest\\.json$"],
+      "matchStrings": [
+        "\"compatible_range\":\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "glean-indexing-sdk",
+      "datasourceTemplate": "pypi"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["glean-indexing-sdk"],
+      "groupName": "glean-indexing-sdk compatibility",
+      "automerge": false,
+      "labels": ["sdk-upgrade"],
+      "commitMessagePrefix": "chore(sdk):"
+    }
+  ]
+}
