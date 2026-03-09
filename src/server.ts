@@ -228,7 +228,7 @@ export function createServer(): McpServer {
     'list_connectors',
     {
       description:
-        'List all connector classes found in this project with their module paths',
+        'List all connector classes found in this project with their module paths.',
       inputSchema: listConnectorsSchema,
     },
     (params) => handleListConnectors(params, getProjectPath()),

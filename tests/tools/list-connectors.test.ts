@@ -41,6 +41,20 @@ test('returns friendly message when no connectors found', () => {
   expect(text).toContain('No connectors found');
 });
 
+test('indicates when DataClient is present', () => {
+  const dir = join(tmpDir, 'src', 'my_connector');
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, 'connector.py'),
+    'class MyConnector(BaseDatasourceConnector):\n    pass\n',
+  );
+  writeFileSync(join(dir, 'data_client.py'), 'class DataClient: pass\n');
+
+  const result = handleListConnectors({}, tmpDir);
+  const text = result.content[0].text as string;
+  expect(text).toContain('✓ DataClient');
+});
+
 test('indicates when DataClient is missing', () => {
   const dir = join(tmpDir, 'src', 'my_connector');
   mkdirSync(dir, { recursive: true });
