@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 """
-Stub JSON-RPC worker for E2E testing.
+Stub JSON-RPC worker — reference implementation of the Glean Connector Worker Protocol v1.0.
 
-Speaks the exact protocol the MCP server's WorkerPool expects:
-- Reads a "run" JSON-RPC request from stdin
-- Finds mock_data.json in src/*/mock_data.json relative to cwd
-- Emits each record as a {"method":"record","params":{...}} notification
-- Emits {"method":"complete"} notification
-- Sends the JSON-RPC success response and exits
+Schema: https://gleanwork.github.io/connector-mcp/protocol/v1.0.json
+
+Execution sequence (per schema):
+1. Read 'execute' request from stdin
+2. Send ExecuteResponse immediately (before fetching any records)
+3. Send RecordFetchedNotification for each record in src/*/mock_data.json
+4. Send ExecutionCompleteNotification
+5. Exit
 """
 
 import glob
 import json
 import sys
+import time
 
 
 def emit(obj):
@@ -29,12 +32,15 @@ def main():
         except json.JSONDecodeError:
             continue
 
-        if request.get("method") != "run":
+        if request.get("method") != "execute":
             continue
 
         request_id = request.get("id")
+        execution_id = "stub-execution"
 
-        # Find mock_data.json in src/*/mock_data.json relative to cwd
+        # ExecuteResponse — immediate, per schema
+        emit({"jsonrpc": "2.0", "result": {"execution_id": execution_id, "status": "started"}, "id": request_id})
+
         matches = glob.glob("src/*/mock_data.json")
         records = []
         if matches:
@@ -44,16 +50,30 @@ def main():
             except (OSError, json.JSONDecodeError):
                 records = []
 
-        # Send JSON-RPC success response first so sendRequest resolves before
-        # the complete notification triggers pool.kill (avoids a Linux race).
-        emit({"jsonrpc": "2.0", "result": {}, "id": request_id})
+        start_ms = time.time() * 1000
 
-        # Emit each record as a notification (no "id" field)
-        for record in records:
-            emit({"method": "record", "params": record})
+        # RecordFetchedNotification per record, per schema
+        for i, record in enumerate(records):
+            emit({
+                "method": "record_fetched",
+                "params": {"record_id": f"stub-{i}", "index": i, "data": record},
+            })
 
-        # Emit complete notification
-        emit({"method": "complete"})
+        duration_ms = time.time() * 1000 - start_ms
+
+        # ExecutionCompleteNotification, per schema
+        emit({
+            "method": "execution_complete",
+            "params": {
+                "execution_id": execution_id,
+                "success": True,
+                "total_records": len(records),
+                "successful_records": len(records),
+                "failed_records": 0,
+                "total_duration_ms": duration_ms,
+            },
+        })
+
         sys.exit(0)
 
 
