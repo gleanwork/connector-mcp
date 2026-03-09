@@ -1,0 +1,16 @@
+from __future__ import annotations
+
+from typing import TypedDict
+
+
+class SourceDocument(TypedDict):
+    """Raw document from the external data source."""
+
+    id: str
+    title: str
+    content: str
+    author: str
+    url: str
+    tags: list[str]
+    created_at: str
+    updated_at: str

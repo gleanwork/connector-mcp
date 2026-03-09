@@ -1,0 +1,23 @@
+[tools]
+python = "3.10"
+uv = "latest"
+
+[tasks.install]
+description = "Install project dependencies"
+run = "uv sync"
+
+[tasks.test]
+description = "Run tests"
+run = "uv run pytest -v tests/"
+
+[tasks.lint]
+description = "Run linter"
+run = "uv run ruff check ."
+
+[tasks."lint:fix"]
+description = "Fix lint issues"
+run = "uv run ruff check --fix ."
+
+[tasks.format]
+description = "Run formatter"
+run = "uv run ruff format ."

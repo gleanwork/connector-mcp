@@ -81,6 +81,47 @@ jobs:
           path: .mcp-test-results/
           retention-days: 7
 
+  python-e2e:
+    name: Python E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up mise
+        uses: jdx/mise-action@v2
+        with:
+          cache: true
+          mise_toml: |
+            [tools]
+            node = "22"
+            python = "3.12"
+            uv = "latest"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+
+      - name: Run Python E2E tests
+        run: npx playwright test tests/mcp/full-e2e.spec.ts
+        env:
+          GLEAN_INSTANCE: ${{ secrets.GLEAN_INSTANCE }}
+          GLEAN_API_TOKEN: ${{ secrets.GLEAN_API_TOKEN }}
+
+      - name: Upload Python E2E test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: python-e2e-test-results
+          path: .mcp-test-results/
+          retention-days: 7
+
   docs:
     name: Docs Check
     runs-on: ubuntu-latest

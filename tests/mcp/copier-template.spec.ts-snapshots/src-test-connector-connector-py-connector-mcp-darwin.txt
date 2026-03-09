@@ -1,0 +1,48 @@
+from __future__ import annotations
+
+import datetime
+from collections.abc import Sequence
+
+from glean.indexing import BaseDatasourceConnector
+from glean.indexing.models import (
+    ContentDefinition,
+    CustomDatasourceConfig,
+    DocumentDefinition,
+    UserReferenceDefinition,
+)
+
+from test_connector.models import SourceDocument
+
+
+class Connector(BaseDatasourceConnector[SourceDocument]):
+    """Transforms source documents into Glean DocumentDefinitions."""
+
+    configuration = CustomDatasourceConfig(
+        name="test_connector",
+        display_name="Test Connector",
+    )
+
+    def transform(self, data: Sequence[SourceDocument]) -> Sequence[DocumentDefinition]:
+        """Convert source documents to Glean document definitions."""
+        documents: list[DocumentDefinition] = []
+        for record in data:
+            doc = DocumentDefinition(
+                datasource="test_connector",
+                id=record["id"],
+                title=record["title"],
+                view_url=record["url"],
+                body=ContentDefinition(
+                    mime_type="text/plain",
+                    text_content=record["content"],
+                ),
+                author=UserReferenceDefinition(name=record["author"]),
+                tags=record["tags"],
+                created_at=int(
+                    datetime.datetime.fromisoformat(record["created_at"].replace("Z", "+00:00")).timestamp()
+                ),
+                updated_at=int(
+                    datetime.datetime.fromisoformat(record["updated_at"].replace("Z", "+00:00")).timestamp()
+                ),
+            )
+            documents.append(doc)
+        return documents
