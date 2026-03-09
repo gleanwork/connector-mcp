@@ -109,6 +109,23 @@ describe('build_connector', () => {
     expect(text).not.toContain('class Connector(');
   });
 
+  it('build_connector warns when connector.py has been customized', async () => {
+    // Write a "customized" connector.py that doesn't import from glean.indexing
+    const srcDir = join(projectPath, 'src', 'connector');
+    mkdirSync(srcDir, { recursive: true });
+    writeFileSync(
+      join(srcDir, 'connector.py'),
+      '# hand-written customization\nclass Connector:\n    pass\n',
+    );
+
+    const result = await handleBuildConnector(
+      { dry_run: false },
+      projectPath,
+    );
+    const text = result.content[0].text as string;
+    expect(text).toMatch(/overwrite|customized|modified/i);
+  });
+
   it('preserves CONCAT transform from mappings into generated connector', async () => {
     // Set up a mapping with a CONCAT transform on a composite title field
     writeFileSync(

@@ -228,9 +228,25 @@ export async function handleBuildConnector(
     // Write files to src/{moduleName}/ — matches Copier template structure
     const srcDir = join(projectPath, 'src', moduleName);
     mkdirSync(srcDir, { recursive: true });
-    writeFileSync(join(srcDir, 'connector.py'), generated.connector);
+
+    const connectorFilePath = join(srcDir, 'connector.py');
+    const overwriteWarnings: string[] = [];
+
+    if (existsSync(connectorFilePath)) {
+      const existing = readFileSync(connectorFilePath, 'utf8');
+      if (!existing.includes('from glean.indexing import')) {
+        overwriteWarnings.push(
+          `⚠ src/${moduleName}/connector.py appears to have been customized and will be overwritten.`,
+        );
+      }
+    }
+
+    writeFileSync(connectorFilePath, generated.connector);
     writeFileSync(join(srcDir, 'models.py'), generated.models);
     writeFileSync(join(srcDir, 'mock_data.json'), generated.mockData);
+
+    const warningText =
+      overwriteWarnings.length > 0 ? '\n\n' + overwriteWarnings.join('\n') : '';
 
     return {
       content: [
@@ -251,7 +267,8 @@ export async function handleBuildConnector(
                 description: 'execute the connector and start ingesting data',
                 tool: 'run_connector',
               },
-            ]),
+            ]) +
+            warningText,
         },
       ],
     };
