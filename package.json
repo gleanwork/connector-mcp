@@ -59,7 +59,7 @@
     "@eslint/eslintrc": "^3.3.4",
     "@eslint/js": "^10.0.1",
     "@gleanwork/mcp-config-schema": "^4.2.0",
-    "@gleanwork/mcp-server-tester": "^0.12.0",
+    "@gleanwork/mcp-server-tester": "^1.0.0-beta.3",
     "@playwright/test": "^1.58.2",
     "@release-it-plugins/lerna-changelog": "^8.0.0",
     "@types/js-yaml": "^4.0.9",
