@@ -105,6 +105,9 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Install copier
+        run: uv tool install copier
+
       - name: Build
         run: npm run build
 
