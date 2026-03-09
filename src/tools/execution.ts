@@ -45,20 +45,23 @@ export async function handleRunConnector(
 
   // Spawn a Python worker asynchronously — don't await it here so we return immediately
   void (async () => {
-    const sdkCheck = checkSdkVersion(projectPath);
-    if (!sdkCheck.ok) {
-      updateExecution(executionId, {
-        status: 'failed',
-        error: [
-          sdkCheck.message,
-          sdkCheck.fix ? `Fix: ${sdkCheck.fix}` : null,
-        ]
-          .filter(Boolean)
-          .join('\n'),
-        completedAt: new Date(),
-      });
-      logger.warn({ executionId, sdkCheck }, 'SDK incompatible — aborting before spawn');
-      return;
+    // Skip SDK version check when using a custom worker command — the SDK is not involved
+    if (!process.env['GLEAN_WORKER_COMMAND']) {
+      const sdkCheck = checkSdkVersion(projectPath);
+      if (!sdkCheck.ok) {
+        updateExecution(executionId, {
+          status: 'failed',
+          error: [
+            sdkCheck.message,
+            sdkCheck.fix ? `Fix: ${sdkCheck.fix}` : null,
+          ]
+            .filter(Boolean)
+            .join('\n'),
+          completedAt: new Date(),
+        });
+        logger.warn({ executionId, sdkCheck }, 'SDK incompatible — aborting before spawn');
+        return;
+      }
     }
 
     const pool = getWorkerPool();
