@@ -64,23 +64,27 @@ Six steps from zero to a running connector. The assistant guides you through eac
 
 | Step | What you're doing                                        | Tool                                     |
 | ---- | -------------------------------------------------------- | ---------------------------------------- |
+| 0    | Verify prerequisites                                     | `check_prerequisites`                    |
 | 1    | Scaffold the project                                     | `create_connector`                       |
 | 2    | Configure the data source                                | `set_config`                             |
 | 3    | Define the schema (infer from a sample file or write it) | `infer_schema` + `update_schema`         |
 | 4    | Map fields and verify required Glean fields are covered  | `confirm_mappings` + `validate_mappings` |
 | 5    | Generate the Python connector code                       | `build_connector`                        |
+| 5a   | Implement real API calls in data_client.py               | `get_data_client` + `update_data_client` |
 | 6    | Run the connector and inspect results                    | `run_connector` + `inspect_execution`    |
 
 ## Tool Reference
 
 ### Project Setup
 
-| Tool               | Description                                                                 |
-| ------------------ | --------------------------------------------------------------------------- |
-| `get_started`      | Open the guided workflow; the assistant asks what you're connecting         |
-| `create_connector` | Scaffold a new connector project and set the active session path            |
-| `set_config`       | Write connector config (auth, endpoint, pagination) to `.glean/config.json` |
-| `get_config`       | Read `.glean/config.json`                                                   |
+| Tool                     | Description                                                                 |
+| ------------------------ | --------------------------------------------------------------------------- |
+| `get_started`            | Open the guided workflow; the assistant asks what you're connecting         |
+| `check_prerequisites`    | Verify uv, python, mise, copier, and Glean credentials are all configured  |
+| `create_connector`       | Scaffold a new connector project and set the active session path            |
+| `list_connectors`        | List all connector classes found in the project with their DataClient status |
+| `set_config`             | Write connector config (auth, endpoint, pagination) to `.glean/config.json` |
+| `get_config`             | Read `.glean/config.json`                                                   |
 
 ### Schema
 
@@ -98,6 +102,13 @@ Six steps from zero to a running connector. The assistant guides you through eac
 | `get_mappings`      | Show source schema and Glean entity model side-by-side |
 | `confirm_mappings`  | Save field mapping decisions to `.glean/mappings.json` |
 | `validate_mappings` | Check mappings for missing required Glean fields       |
+
+### Data Client
+
+| Tool                  | Description                                                                               |
+| --------------------- | ----------------------------------------------------------------------------------------- |
+| `get_data_client`     | Read `data_client.py` and connector config — use before asking AI to write real API calls |
+| `update_data_client`  | Write a new `data_client.py` implementation (replaces the mock with real API calls)       |
 
 ### Build & Run
 
