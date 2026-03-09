@@ -49,10 +49,10 @@ function checkCommandAvailable(cmd: string): boolean {
   }
 }
 
-const available =
-  checkCommandAvailable('mise') && checkCommandAvailable('uv');
+const available = checkCommandAvailable('mise') && checkCommandAvailable('uv');
 
 const templateTest = base.extend<{ baseDir: string }>({
+  // eslint-disable-next-line no-empty-pattern
   baseDir: async ({}, use) => {
     const project = new Project('copier-template-test', '0.0.0', { files: {} });
     await project.write();

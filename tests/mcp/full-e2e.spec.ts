@@ -48,6 +48,7 @@ type StubFixtures = {
 };
 
 const stubTest = base.extend<StubFixtures>({
+  // eslint-disable-next-line no-empty-pattern
   stubProject: async ({}, use) => {
     const project = new Project('stub-e2e-project', '0.0.0', {
       files: {
@@ -162,6 +163,7 @@ const uvAvailable = checkCommandAvailable('uv');
 const tier2Available = miseAvailable && uvAvailable;
 
 const tier2Test = base.extend<{ baseDir: string }>({
+  // eslint-disable-next-line no-empty-pattern
   baseDir: async ({}, use) => {
     const project = new Project('tier2-e2e-project', '0.0.0', { files: {} });
     await project.write();

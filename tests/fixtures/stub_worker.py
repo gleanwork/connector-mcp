@@ -44,15 +44,16 @@ def main():
             except (OSError, json.JSONDecodeError):
                 records = []
 
+        # Send JSON-RPC success response first so sendRequest resolves before
+        # the complete notification triggers pool.kill (avoids a Linux race).
+        emit({"jsonrpc": "2.0", "result": {}, "id": request_id})
+
         # Emit each record as a notification (no "id" field)
         for record in records:
             emit({"method": "record", "params": record})
 
         # Emit complete notification
         emit({"method": "complete"})
-
-        # Send JSON-RPC success response
-        emit({"jsonrpc": "2.0", "result": {}, "id": request_id})
         sys.exit(0)
 
 
