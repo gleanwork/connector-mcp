@@ -13,6 +13,7 @@ import {
 import { getLogger } from '../lib/logger.js';
 import { getProjectPath } from '../session.js';
 import { formatNextSteps } from './workflow.js';
+import { checkSdkVersion } from './prerequisites.js';
 
 const logger = getLogger('execution');
 
@@ -44,6 +45,22 @@ export async function handleRunConnector(
 
   // Spawn a Python worker asynchronously — don't await it here so we return immediately
   void (async () => {
+    const sdkCheck = checkSdkVersion(projectPath);
+    if (!sdkCheck.ok) {
+      updateExecution(executionId, {
+        status: 'failed',
+        error: [
+          sdkCheck.message,
+          sdkCheck.fix ? `Fix: ${sdkCheck.fix}` : null,
+        ]
+          .filter(Boolean)
+          .join('\n'),
+        completedAt: new Date(),
+      });
+      logger.warn({ executionId, sdkCheck }, 'SDK incompatible — aborting before spawn');
+      return;
+    }
+
     const pool = getWorkerPool();
     const spawnResult = await pool.spawn(projectPath);
 

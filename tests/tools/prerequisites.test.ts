@@ -22,6 +22,14 @@ test('includes all 6 expected check names', () => {
   expect(names).toContain('GLEAN_API_TOKEN');
 });
 
+test('checkSdkVersion returns ok: false when .venv is missing', async () => {
+  const { checkSdkVersion } = await import('../../src/tools/prerequisites.js');
+  const result = checkSdkVersion('/nonexistent/project');
+  expect(result.ok).toBe(false);
+  expect(result.installedVersion).toBeNull();
+  expect(result.fix).toContain('uv sync');
+});
+
 test('handleCheckPrerequisites returns formatted text with check icons', async () => {
   const { handleCheckPrerequisites } = await import('../../src/tools/prerequisites.js');
   const result = handleCheckPrerequisites({});

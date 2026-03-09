@@ -1,5 +1,8 @@
 import { z } from 'zod';
 import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { getProjectPath } from '../session.js';
 
 export const checkPrerequisitesSchema = z.object({});
 
@@ -21,7 +24,7 @@ function tryCommand(cmd: string, args: string[]): string | null {
   }
 }
 
-export function checkPrerequisites(): { checks: PrerequisiteCheck[] } {
+export function checkPrerequisites(projectPath = getProjectPath()): { checks: PrerequisiteCheck[] } {
   const checks: PrerequisiteCheck[] = [];
 
   const uvVersion = tryCommand('uv', ['--version']);
@@ -99,7 +102,81 @@ export function checkPrerequisites(): { checks: PrerequisiteCheck[] } {
       : 'Add GLEAN_API_TOKEN=your-token to .env\nCreate one at https://<your-company>.glean.com/admin/api-tokens',
   });
 
+  const sdkResult = checkSdkVersion(projectPath);
+  if (existsSync(join(projectPath, '.venv', 'bin', 'python'))) {
+    checks.push({
+      name: 'glean-indexing-sdk',
+      ok: sdkResult.ok,
+      message: sdkResult.message,
+      fix: sdkResult.fix,
+    });
+  }
+
   return { checks };
+}
+
+export interface SdkVersionResult {
+  ok: boolean;
+  installedVersion: string | null;
+  requiredRange: string;
+  message: string;
+  fix?: string;
+}
+
+export function checkSdkVersion(projectPath: string): SdkVersionResult {
+  const manifestPath = join(projectPath, '.glean', 'manifest.json');
+  let requiredRange = '>=1.0.0b1,<2.0';
+
+  if (existsSync(manifestPath)) {
+    try {
+      const m = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
+        sdk?: { compatible_range?: string };
+      };
+      requiredRange = m.sdk?.compatible_range ?? requiredRange;
+    } catch {
+      // use default
+    }
+  }
+
+  const venvPython = join(projectPath, '.venv', 'bin', 'python');
+  if (!existsSync(venvPython)) {
+    return {
+      ok: false,
+      installedVersion: null,
+      requiredRange,
+      message: `No .venv found in ${projectPath}`,
+      fix: `cd ${projectPath} && uv sync`,
+    };
+  }
+
+  const version = tryCommand(venvPython, [
+    '-c',
+    "import importlib.metadata; print(importlib.metadata.version('glean-indexing-sdk'))",
+  ]);
+
+  if (!version) {
+    return {
+      ok: false,
+      installedVersion: null,
+      requiredRange,
+      message: 'glean-indexing-sdk not installed in .venv',
+      fix: `cd ${projectPath} && uv add 'glean-indexing-sdk${requiredRange}'`,
+    };
+  }
+
+  // Range ">=1.0.0b1,<2.0" — accept v1.x only
+  const majorOk = version.startsWith('1.');
+  return {
+    ok: majorOk,
+    installedVersion: version,
+    requiredRange,
+    message: majorOk
+      ? `${version} (compatible with ${requiredRange})`
+      : `${version} — required: ${requiredRange}`,
+    fix: majorOk
+      ? undefined
+      : `cd ${projectPath} && uv add 'glean-indexing-sdk${requiredRange}'`,
+  };
 }
 
 export function handleCheckPrerequisites(
