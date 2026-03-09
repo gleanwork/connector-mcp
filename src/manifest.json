@@ -1,0 +1,11 @@
+{
+  "connector_mcp_version": "0.6.0",
+  "worker_protocol": {
+    "version": "1.0",
+    "schema": "https://gleanwork.github.io/connector-mcp/protocol/v1.0.json"
+  },
+  "sdk": {
+    "package": "glean-indexing-sdk",
+    "compatible_range": ">=1.0.0b1,<2.0"
+  }
+}

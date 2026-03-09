@@ -32,7 +32,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp src/manifest.json dist/manifest.json",
     "prepare": "npm run build && chmod +x bin/connector-mcp.js",
     "dev": "tsx watch src/index.ts",
     "format": "prettier --write --ignore-unknown .",
