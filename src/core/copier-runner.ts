@@ -7,7 +7,7 @@
  */
 
 import { execFile } from 'node:child_process';
-import { existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { promisify } from 'node:util';
 
@@ -64,6 +64,21 @@ export interface CopierData {
   description?: string;
 }
 
+function getSdkRangeFromManifest(): string {
+  try {
+    const manifestPath = resolve(
+      new URL(import.meta.url).pathname,
+      '../../manifest.json',
+    );
+    const m = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
+      sdk?: { compatible_range?: string };
+    };
+    return m.sdk?.compatible_range ?? '>=1.0.0b1,<2.0';
+  } catch {
+    return '>=1.0.0b1,<2.0';
+  }
+}
+
 /**
  * Run Copier to scaffold a new connector project.
  *
@@ -92,6 +107,7 @@ export async function runCopier(
     if (data.description) {
       extraData.push('--data', `description=${data.description}`);
     }
+    extraData.push('--data', `sdk_range=${getSdkRangeFromManifest()}`);
 
     const args = [
       'run',
