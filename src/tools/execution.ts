@@ -59,7 +59,10 @@ export async function handleRunConnector(
             .join('\n'),
           completedAt: new Date(),
         });
-        logger.warn({ executionId, sdkCheck }, 'SDK incompatible — aborting before spawn');
+        logger.warn(
+          { executionId, sdkCheck },
+          'SDK incompatible — aborting before spawn',
+        );
         return;
       }
     }
@@ -89,7 +92,11 @@ export async function handleRunConnector(
 
       if (msg['method'] === 'record_fetched') {
         const p = msg['params'] as
-          | { record_id?: string; index?: number; data?: Record<string, unknown> }
+          | {
+              record_id?: string;
+              index?: number;
+              data?: Record<string, unknown>;
+            }
           | undefined;
         const record = p?.data;
         if (record) {
@@ -112,7 +119,9 @@ export async function handleRunConnector(
           updateExecution(executionId, { logs: [...current.logs, p.message] });
         }
       } else if (msg['method'] === 'execution_complete') {
-        const p = msg['params'] as { success?: boolean; error?: string } | undefined;
+        const p = msg['params'] as
+          | { success?: boolean; error?: string }
+          | undefined;
         if (p?.success === false) {
           updateExecution(executionId, {
             status: 'failed',
@@ -399,7 +408,11 @@ export async function handleManageRecording(
 
           if (msg['method'] === 'record_fetched') {
             const p = msg['params'] as
-              | { record_id?: string; index?: number; data?: Record<string, unknown> }
+              | {
+                  record_id?: string;
+                  index?: number;
+                  data?: Record<string, unknown>;
+                }
               | undefined;
             const record = p?.data;
             if (record) {
@@ -425,7 +438,9 @@ export async function handleManageRecording(
               });
             }
           } else if (msg['method'] === 'execution_complete') {
-            const p = msg['params'] as { success?: boolean; error?: string } | undefined;
+            const p = msg['params'] as
+              | { success?: boolean; error?: string }
+              | undefined;
             if (p?.success === false) {
               manager.cancelRecording();
               updateExecution(executionId, {

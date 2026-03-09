@@ -5,9 +5,7 @@
     {
       "customType": "regex",
       "fileMatch": ["^src/manifest\\.json$"],
-      "matchStrings": [
-        "\"compatible_range\":\\s*\"(?<currentValue>[^\"]+)\""
-      ],
+      "matchStrings": ["\"compatible_range\":\\s*\"(?<currentValue>[^\"]+)\""],
       "depNameTemplate": "glean-indexing-sdk",
       "datasourceTemplate": "pypi"
     }

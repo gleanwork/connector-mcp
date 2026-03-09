@@ -24,7 +24,9 @@ function tryCommand(cmd: string, args: string[]): string | null {
   }
 }
 
-export function checkPrerequisites(projectPath = getProjectPath()): { checks: PrerequisiteCheck[] } {
+export function checkPrerequisites(projectPath = getProjectPath()): {
+  checks: PrerequisiteCheck[];
+} {
   const checks: PrerequisiteCheck[] = [];
 
   const uvVersion = tryCommand('uv', ['--version']);

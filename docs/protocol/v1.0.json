@@ -18,7 +18,10 @@
           "required": ["connector"],
           "additionalProperties": false,
           "properties": {
-            "connector": { "type": "string", "description": "Exact connector class name" },
+            "connector": {
+              "type": "string",
+              "description": "Exact connector class name"
+            },
             "step_mode": { "type": "boolean", "default": false },
             "mock_data_path": { "type": ["string", "null"] }
           }

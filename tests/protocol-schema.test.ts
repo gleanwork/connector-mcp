@@ -40,7 +40,9 @@ describe('Protocol schema v1.0 — connector-mcp message shapes', () => {
 
   it('valid RecordFetchedNotification passes schema', () => {
     const validate = ajv.compile(
-      (schema.definitions as Record<string, unknown>)['RecordFetchedNotification'],
+      (schema.definitions as Record<string, unknown>)[
+        'RecordFetchedNotification'
+      ],
     );
     expect(
       validate({
@@ -52,7 +54,9 @@ describe('Protocol schema v1.0 — connector-mcp message shapes', () => {
 
   it('old record notification method fails schema', () => {
     const validate = ajv.compile(
-      (schema.definitions as Record<string, unknown>)['RecordFetchedNotification'],
+      (schema.definitions as Record<string, unknown>)[
+        'RecordFetchedNotification'
+      ],
     );
     expect(
       validate({ method: 'record', params: { id: '1', title: 'T' } }),
@@ -61,7 +65,9 @@ describe('Protocol schema v1.0 — connector-mcp message shapes', () => {
 
   it('valid ExecutionCompleteNotification passes schema', () => {
     const validate = ajv.compile(
-      (schema.definitions as Record<string, unknown>)['ExecutionCompleteNotification'],
+      (schema.definitions as Record<string, unknown>)[
+        'ExecutionCompleteNotification'
+      ],
     );
     expect(
       validate({

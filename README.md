@@ -77,14 +77,14 @@ Six steps from zero to a running connector. The assistant guides you through eac
 
 ### Project Setup
 
-| Tool                     | Description                                                                 |
-| ------------------------ | --------------------------------------------------------------------------- |
-| `get_started`            | Open the guided workflow; the assistant asks what you're connecting         |
-| `check_prerequisites`    | Verify uv, python, mise, copier, and Glean credentials are all configured  |
-| `create_connector`       | Scaffold a new connector project and set the active session path            |
-| `list_connectors`        | List all connector classes found in the project with their DataClient status |
-| `set_config`             | Write connector config (auth, endpoint, pagination) to `.glean/config.json` |
-| `get_config`             | Read `.glean/config.json`                                                   |
+| Tool                  | Description                                                                  |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `get_started`         | Open the guided workflow; the assistant asks what you're connecting          |
+| `check_prerequisites` | Verify uv, python, mise, copier, and Glean credentials are all configured    |
+| `create_connector`    | Scaffold a new connector project and set the active session path             |
+| `list_connectors`     | List all connector classes found in the project with their DataClient status |
+| `set_config`          | Write connector config (auth, endpoint, pagination) to `.glean/config.json`  |
+| `get_config`          | Read `.glean/config.json`                                                    |
 
 ### Schema
 
@@ -105,10 +105,10 @@ Six steps from zero to a running connector. The assistant guides you through eac
 
 ### Data Client
 
-| Tool                  | Description                                                                               |
-| --------------------- | ----------------------------------------------------------------------------------------- |
-| `get_data_client`     | Read `data_client.py` and connector config — use before asking AI to write real API calls |
-| `update_data_client`  | Write a new `data_client.py` implementation (replaces the mock with real API calls)       |
+| Tool                 | Description                                                                               |
+| -------------------- | ----------------------------------------------------------------------------------------- |
+| `get_data_client`    | Read `data_client.py` and connector config — use before asking AI to write real API calls |
+| `update_data_client` | Write a new `data_client.py` implementation (replaces the mock with real API calls)       |
 
 ### Build & Run
 

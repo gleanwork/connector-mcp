@@ -8,7 +8,8 @@ import {
 } from '../../src/tools/data-client.js';
 
 let tmpDir: string;
-const STUB = 'class DataClient:\n    def get_source_data(self):\n        pass\n';
+const STUB =
+  'class DataClient:\n    def get_source_data(self):\n        pass\n';
 
 beforeEach(() => {
   tmpDir = join(tmpdir(), `data-client-test-${Date.now()}`);
@@ -37,7 +38,10 @@ test('get_data_client returns error when module not found', () => {
 test('get_data_client includes config context when config exists', () => {
   const gleanDir = join(tmpDir, '.glean');
   mkdirSync(gleanDir, { recursive: true });
-  writeFileSync(join(gleanDir, 'config.json'), JSON.stringify({ name: 'jira' }));
+  writeFileSync(
+    join(gleanDir, 'config.json'),
+    JSON.stringify({ name: 'jira' }),
+  );
   const result = handleGetDataClient({ module_name: 'jira_connector' }, tmpDir);
   const text = result.content[0].text as string;
   expect(text).toContain('config.json');

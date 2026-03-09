@@ -118,10 +118,7 @@ describe('build_connector', () => {
       '# hand-written customization\nclass Connector:\n    pass\n',
     );
 
-    const result = await handleBuildConnector(
-      { dry_run: false },
-      projectPath,
-    );
+    const result = await handleBuildConnector({ dry_run: false }, projectPath);
     const text = result.content[0].text as string;
     expect(text).toMatch(/overwrite|customized|modified/i);
   });

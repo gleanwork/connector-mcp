@@ -27,7 +27,12 @@ export function handleGetDataClient(
   params: z.infer<typeof getDataClientSchema>,
   projectPath = getProjectPath(),
 ) {
-  const filePath = join(projectPath, 'src', params.module_name, 'data_client.py');
+  const filePath = join(
+    projectPath,
+    'src',
+    params.module_name,
+    'data_client.py',
+  );
 
   if (!existsSync(filePath)) {
     return {

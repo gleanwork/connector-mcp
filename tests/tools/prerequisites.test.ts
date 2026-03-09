@@ -31,7 +31,8 @@ test('checkSdkVersion returns ok: false when .venv is missing', async () => {
 });
 
 test('handleCheckPrerequisites returns formatted text with check icons', async () => {
-  const { handleCheckPrerequisites } = await import('../../src/tools/prerequisites.js');
+  const { handleCheckPrerequisites } =
+    await import('../../src/tools/prerequisites.js');
   const result = handleCheckPrerequisites({});
   const text = result.content[0].text as string;
   // Should include check icons and names
