@@ -62,20 +62,23 @@ export async function handleRunConnector(
 
     const { workerId } = spawnResult.value;
 
-    // Wire worker notifications into the execution state
+    // Wire worker notifications into the execution state (SDK 1.x protocol — v1.0 schema)
     pool.addNotificationHandler(workerId, (msg) => {
       const current = getExecution(executionId);
       if (!current) return;
 
-      if (msg['method'] === 'record') {
-        const record = msg['params'] as Record<string, unknown> | undefined;
+      if (msg['method'] === 'record_fetched') {
+        const p = msg['params'] as
+          | { record_id?: string; index?: number; data?: Record<string, unknown> }
+          | undefined;
+        const record = p?.data;
         if (record) {
           updateExecution(executionId, {
             recordsFetched: current.recordsFetched + 1,
             records: [
               ...current.records,
               {
-                id: randomUUID(),
+                id: p?.record_id ?? randomUUID(),
                 raw: record,
                 mapped: {},
                 validationIssues: [],
@@ -88,27 +91,30 @@ export async function handleRunConnector(
         if (p?.message) {
           updateExecution(executionId, { logs: [...current.logs, p.message] });
         }
-      } else if (msg['method'] === 'complete') {
-        updateExecution(executionId, {
-          status: 'complete',
-          completedAt: new Date(),
-        });
-        void pool.kill(workerId);
-      } else if (msg['method'] === 'error') {
-        const p = msg['params'] as { message?: string } | undefined;
-        updateExecution(executionId, {
-          status: 'failed',
-          error: p?.message ?? 'Unknown error',
-          completedAt: new Date(),
-        });
+      } else if (msg['method'] === 'execution_complete') {
+        const p = msg['params'] as { success?: boolean; error?: string } | undefined;
+        if (p?.success === false) {
+          updateExecution(executionId, {
+            status: 'failed',
+            error: p.error ?? 'Execution failed',
+            completedAt: new Date(),
+          });
+        } else {
+          updateExecution(executionId, {
+            status: 'complete',
+            completedAt: new Date(),
+          });
+        }
         void pool.kill(workerId);
       }
+      // Other SDK notifications (phase_start, phase_complete, heartbeat, transform_complete)
+      // are informational and not currently surfaced by connector-mcp.
     });
 
-    // Send start command to worker
-    const startResult = await pool.sendRequest(workerId, 'run', {
-      connector_name: params.connector_name ?? 'Connector',
-      recording_id: params.recording_id,
+    // execute returns {execution_id, status: "started"} immediately.
+    // Notifications arrive asynchronously per the v1.0 protocol schema.
+    const startResult = await pool.sendRequest(workerId, 'execute', {
+      connector: params.connector_name ?? 'Connector',
     });
 
     if (!startResult.ok) {
@@ -371,8 +377,11 @@ export async function handleManageRecording(
           const current = getExecution(executionId);
           if (!current) return;
 
-          if (msg['method'] === 'record') {
-            const record = msg['params'] as Record<string, unknown> | undefined;
+          if (msg['method'] === 'record_fetched') {
+            const p = msg['params'] as
+              | { record_id?: string; index?: number; data?: Record<string, unknown> }
+              | undefined;
+            const record = p?.data;
             if (record) {
               manager.addRecord(record);
               updateExecution(executionId, {
@@ -380,7 +389,7 @@ export async function handleManageRecording(
                 records: [
                   ...current.records,
                   {
-                    id: randomUUID(),
+                    id: p?.record_id ?? randomUUID(),
                     raw: record,
                     mapped: {},
                     validationIssues: [],
@@ -395,37 +404,38 @@ export async function handleManageRecording(
                 logs: [...current.logs, p.message],
               });
             }
-          } else if (msg['method'] === 'complete') {
-            const saved = manager.saveRecording();
-            updateExecution(executionId, {
-              status: 'complete',
-              completedAt: new Date(),
-            });
-            if (saved) {
-              logger.info(
-                {
-                  executionId,
-                  recordingId: saved.recording_id,
-                  recordCount: saved.record_count,
-                },
-                'Recording saved',
-              );
+          } else if (msg['method'] === 'execution_complete') {
+            const p = msg['params'] as { success?: boolean; error?: string } | undefined;
+            if (p?.success === false) {
+              manager.cancelRecording();
+              updateExecution(executionId, {
+                status: 'failed',
+                error: p.error ?? 'Execution failed',
+                completedAt: new Date(),
+              });
+            } else {
+              const saved = manager.saveRecording();
+              updateExecution(executionId, {
+                status: 'complete',
+                completedAt: new Date(),
+              });
+              if (saved) {
+                logger.info(
+                  {
+                    executionId,
+                    recordingId: saved.recording_id,
+                    recordCount: saved.record_count,
+                  },
+                  'Recording saved',
+                );
+              }
             }
-            void pool.kill(workerId);
-          } else if (msg['method'] === 'error') {
-            manager.cancelRecording();
-            const p = msg['params'] as { message?: string } | undefined;
-            updateExecution(executionId, {
-              status: 'failed',
-              error: p?.message ?? 'Unknown error',
-              completedAt: new Date(),
-            });
             void pool.kill(workerId);
           }
         });
 
-        const startResult = await pool.sendRequest(workerId, 'run', {
-          connector_name: connectorName,
+        const startResult = await pool.sendRequest(workerId, 'execute', {
+          connector: connectorName,
         });
 
         if (!startResult.ok) {
