@@ -24,6 +24,10 @@ test('MCP protocol conformance', async ({ mcp }, testInfo) => {
         'run_connector',
         'inspect_execution',
         'manage_recording',
+        'list_connectors',
+        'get_data_client',
+        'update_data_client',
+        'check_prerequisites',
       ],
       validateSchemas: true,
       checkServerInfo: true,
@@ -43,9 +47,9 @@ test.describe('MCP Protocol Conformance', () => {
     expect(info?.version).toBeTruthy();
   });
 
-  test('lists all 15 tools', async ({ mcp }) => {
+  test('lists all 19 tools', async ({ mcp }) => {
     const tools = await mcp.listTools();
-    expect(tools.length).toBe(15);
+    expect(tools.length).toBe(19);
   });
 
   test('tool names match expected set', async ({ mcp }) => {
@@ -54,17 +58,21 @@ test.describe('MCP Protocol Conformance', () => {
     expect(names).toEqual([
       'analyze_field',
       'build_connector',
+      'check_prerequisites',
       'confirm_mappings',
       'create_connector',
       'get_config',
+      'get_data_client',
       'get_mappings',
       'get_schema',
       'get_started',
       'infer_schema',
       'inspect_execution',
+      'list_connectors',
       'manage_recording',
       'run_connector',
       'set_config',
+      'update_data_client',
       'update_schema',
       'validate_mappings',
     ]);
