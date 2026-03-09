@@ -39,6 +39,10 @@ import {
   handleInspectExecution,
   handleManageRecording,
 } from './tools/execution.js';
+import {
+  listConnectorsSchema,
+  handleListConnectors,
+} from './tools/list-connectors.js';
 import { WORKFLOW_GUIDE } from './resources/workflow.js';
 import { getProjectPath } from './session.js';
 
@@ -218,6 +222,16 @@ export function createServer(): McpServer {
       inputSchema: manageRecordingSchema,
     },
     (params) => handleManageRecording(params, getProjectPath()),
+  );
+
+  server.registerTool(
+    'list_connectors',
+    {
+      description:
+        'List all connector classes found in this project with their module paths',
+      inputSchema: listConnectorsSchema,
+    },
+    (params) => handleListConnectors(params, getProjectPath()),
   );
 
   // ── Resources ─────────────────────────────────────────────────
