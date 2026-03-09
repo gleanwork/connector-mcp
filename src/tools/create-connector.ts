@@ -1,10 +1,17 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { join, resolve } from 'node:path';
 import { z } from 'zod';
-import { join } from 'node:path';
 
 import { runCopier } from '../core/copier-runner.js';
 import { setProjectPath } from '../session.js';
 import { atomicWriteFileSync } from '../core/fs-utils.js';
 import { formatNextSteps } from './workflow.js';
+
+const CONNECTOR_MANIFEST = readFileSync(
+  resolve(fileURLToPath(import.meta.url), '../../manifest.json'),
+  'utf8',
+);
 
 const CLAUDE_MD_TEMPLATE = `# Glean Connector: {{connector_name}}
 
@@ -100,6 +107,10 @@ export async function handleCreateConnector(params: CreateConnectorParams) {
     params.name,
   );
   atomicWriteFileSync(join(projectPath, 'CLAUDE.md'), claudeMd);
+  atomicWriteFileSync(
+    join(projectPath, '.glean', 'manifest.json'),
+    CONNECTOR_MANIFEST,
+  );
 
   // Set the session active project path so subsequent tools target this project
   setProjectPath(projectPath);
